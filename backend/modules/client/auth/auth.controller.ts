@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 
-import { asyncHandler } from "../../utils/asyncHandler";
-import { sendResponse } from "../../utils/response";
-import { AppError } from "../../utils/appError";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { sendResponse } from "@/utils/response";
+import { AppError } from "@/utils/appError";
 
 import {
   signupService,

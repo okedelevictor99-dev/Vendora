@@ -1,5 +1,5 @@
-import { User, IUser } from '../../models/user.model';
-import { Token } from '../../models/user.token.model';
+import { User, IUser } from '@/models/user.model';
+import { Token } from '@/models/user.token.model';
 import mongoose from 'mongoose';
 
 
