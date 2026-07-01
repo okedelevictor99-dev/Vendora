@@ -1,0 +1,104 @@
+Folder PATH listing
+Volume serial number is 58CA-8815
+C:.
+|   app.ts
+|   server.ts
+|   structure.txt
+|   
++---config
+|       db.ts
+|       env.ts
+|       logger.config.ts
+|       
++---cron
+|       cron.index.ts
+|       cron.order.ts
+|       cron.payment.ts
+|       
++---logs
+|       combined.log
+|       error.log
+|       
++---middlewares
+|       admin.middleware.ts
+|       error.middleware.ts
+|       rateLimit.middleware.ts
+|       superAdmin.middleware.ts
+|       user.middleware.ts
+|       validate.middleware.ts
+|       
++---models
+|       admin.model.ts
+|       admin.token.model.ts
+|       cart.model.ts
+|       order.model.ts
+|       product.model.ts
+|       user.model.ts
+|       user.token.model.ts
+|       
++---modules
+|   +---admin
+|   |   \---auth
+|   |           auth.controller.ts
+|   |           auth.repo.ts
+|   |           auth.routes.ts
+|   |           auth.service.ts
+|   |           auth.validation.ts
+|   |           
+|   +---auth
+|   |       auth.controller.ts
+|   |       auth.repo.ts
+|   |       auth.routes.ts
+|   |       auth.services.ts
+|   |       auth.validation.ts
+|   |       
+|   +---cart
+|   |       cart.controller.ts
+|   |       cart.repo.ts
+|   |       cart.routes.ts
+|   |       cart.service.ts
+|   |       cart.validation.ts
+|   |       
+|   +---order
+|   |       order.controller.ts
+|   |       order.repo.ts
+|   |       order.routes.ts
+|   |       order.service.ts
+|   |       order.validation.ts
+|   |       
+|   +---products
+|   |       product.controller.ts
+|   |       product.repo.ts
+|   |       product.routes.ts
+|   |       product.services.ts
+|   |       product.validation.ts
+|   |       
+|   +---user
+|   |       user.controller.ts
+|   |       user.routes.ts
+|   |       user.services.ts
+|   |       user.validation.ts
+|   |       
+|   \---webhook
+|           webhook.controller.ts
+|           webhook.route.ts
+|           webhook.services.ts
+|           webhook.validation.ts
+|           
++---seed
+|       product.seed.ts
+|       superadmin.seed.ts
+|       
++---types
+|       express.d.ts
+|       
+\---utils
+        appError.ts
+        asyncHandler.ts
+        email.ts
+        formatCart.ts
+        jwt.ts
+        pagination.ts
+        paystack.ts
+        response.ts
+        
