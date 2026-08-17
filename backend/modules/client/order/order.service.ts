@@ -1,27 +1,21 @@
 import mongoose from "mongoose";
-import { AppError } from "../../utils/appError";
-import { getPopulatedCart } from "../cart/cart.repo";
+import { AppError } from "@/utils/appError";
+import { getPopulatedCart } from "@/modules/client/cart/cart.repo";
 import {
   createOrder,
   findOrderByReference,
-  reserveStock,
-  markOrderAsDelivered,
-  markOrderAsRefunded,
-  markOrderAsShipped,
-} from "./order.repo";
-import { generateReference } from "../../utils/paystack";
-import { initializePaystackTransaction, verifyPaystackPayment } from "../../utils/paystack";
-import { findUserById } from "../auth/auth.repo";
-import { failureWorker, successWorker } from "../webhook/webhook.services";
-import { logger } from "../../configs/logger.config";
-import { getPaginationOptions, buildPaginationMeta } from "../../utils/pagination";
+  reserveStock
+} from "@/modules/client/order/order.repo";
+import { generateReference } from "@/utils/paystack";
+import { initializePaystackTransaction, verifyPaystackPayment } from "@/utils/paystack";
+import { findUserById } from "@/modules/client/auth/auth.repo";
+import { failureWorker, successWorker } from "@/modules/client/webhook/webhook.services";
+import { logger } from "@/configs/logger.config";
+import { getPaginationOptions, buildPaginationMeta } from "@/utils/pagination";
 import {
   findOrdersByUserId,
-  findOrderByIdAndUserId,
-  findAllOrders,
-  findOrderByIdForAdmin,
-  AdminOrderFilters,
-} from "./order.repo";
+  findOrderByIdAndUserId
+} from "@/modules/client/order/order.repo";
 
 const RESERVATION_EXPIRY_MINUTES = 20;
 
@@ -114,18 +108,6 @@ export const manualVerifyOrderService = async (reference: string, userId: string
   return { status: "initiated", message: "Payment still pending, please try again shortly" };
 };
 
-export const markOrderRefundedService = async (reference: string, note?: string) => {
-  const order = await markOrderAsRefunded(reference, note);
-
-  if (!order) {
-    throw new AppError(
-      "Order not found or not eligible for refund. Order must be cannot_fulfill with a pending refund status.",
-      400
-    );
-  }
-
-  return order;
-};
 
 export const getUserOrdersService = async (userId: string, query: { page?: number; limit?: number }) => {
   const options = getPaginationOptions(query);
@@ -141,28 +123,3 @@ export const getUserOrderByIdService = async (orderId: string, userId: string) =
   return order;
 };
 
-export const getAdminOrdersService = async (query: { page?: number; limit?: number }, filters: AdminOrderFilters) => {
-  const options = getPaginationOptions(query);
-  const { orders, total } = await findAllOrders(options, filters);
-  const meta = buildPaginationMeta(total, options);
-
-  return { orders, meta };
-};
-
-export const getAdminOrderByIdService = async (orderId: string) => {
-  const order = await findOrderByIdForAdmin(orderId);
-  if (!order) throw new AppError("Order not found.", 404);
-  return order;
-};
-
-export const markOrderAsShippedService = async (reference: string) => {
-  const order = await markOrderAsShipped(reference);
-  if (!order) throw new AppError("Order not found or is not in a paid state.", 400);
-  return order;
-};
-
-export const markOrderAsDeliveredService = async (reference: string) => {
-  const order = await markOrderAsDelivered(reference);
-  if (!order) throw new AppError("Order not found or is not in a shipped state.", 400);
-  return order;
-};

@@ -1,5 +1,5 @@
 
-import { AppError } from "./appError";
+import { AppError } from "@/utils/appError";
 import crypto from 'crypto'
 import axios from "axios";
 
@@ -14,7 +14,7 @@ export const generateReference = (prefix: string = "ORD"): string => {
 
 export const initializePaystackTransaction = async (
   email: string,
-  amount: number, 
+  amount: number,
   reference: string
 ) => {
   const response = await axios.post(
@@ -23,6 +23,7 @@ export const initializePaystackTransaction = async (
       email,
       amount: Math.round(amount * 100),
       reference,
+      callback_url: `${process.env.CLIENT_URL}/dashboard/payment/verify`,
     },
     {
       headers: {
@@ -32,9 +33,8 @@ export const initializePaystackTransaction = async (
     }
   );
 
-  return response.data.data; 
+  return response.data.data;
 };
-
 
 export type PaystackVerifyResult = "success" | "failed" | "inconclusive";
 

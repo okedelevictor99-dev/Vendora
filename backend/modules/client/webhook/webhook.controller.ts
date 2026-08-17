@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { sendResponse } from "../../utils/response";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { sendResponse } from "@/utils/response";
 
-import { verifyPaystackSignature } from "../../utils/paystack";
-import { successWorker, failureWorker } from "../webhook/webhook.services";
-import { AppError } from "../../utils/appError";
+import { verifyPaystackSignature } from "@/utils/paystack";
+import { successWorker, failureWorker } from "@/modules/client/webhook/webhook.services";
+import { AppError } from "@/utils/appError";
 
 export const paystackWebhookController = asyncHandler(async (req: Request, res: Response) => {
   const signature = req.headers["x-paystack-signature"] as string;

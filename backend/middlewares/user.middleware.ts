@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../configs/env';
-import { AppError } from '../utils/appError';
-import { asyncHandler } from '../utils/asyncHandler';
-import { findUserById } from '../modules/auth/auth.repo';
+import { AppError } from "@/utils/appError";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { findUserById } from "@/modules/client/auth/auth.repo";
 
 
 
@@ -50,6 +50,9 @@ export const user = asyncHandler(
 
 
     if (!user) {
+      throw new AppError('User no longer exists.', 401);
+    }
+    if (user.isDeleted) {
       throw new AppError('User no longer exists.', 401);
     }
 

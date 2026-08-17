@@ -1,12 +1,12 @@
 import { Router } from "express";
 
-import { user } from "../../middlewares/user.middleware";
-import { validate } from "../../middlewares/validate.middleware";
+import { user } from "@/middlewares/user.middleware";
+import { validate } from "@/middlewares/validate.middleware";
 
-import { addToCart,getCart,increaseQuantity,decreaseQuantity,removeFromCart,clearCart } from "./cart.controller";
+import { addToCart,getCart,increaseQuantity,decreaseQuantity,removeFromCart,clearCart } from "@/modules/client/cart/cart.controller";
 
-import { addToCartSchema } from "./cart.validation";
-import { productIdParamSchema } from "./cart.validation";
+import { addToCartSchema } from "@/modules/client/cart/cart.validation";
+import { productIdParamSchema } from "@/modules/client/cart/cart.validation";
 
 const router = Router();
 

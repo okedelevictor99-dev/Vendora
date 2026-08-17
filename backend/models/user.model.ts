@@ -16,6 +16,8 @@ export interface IUser extends Document {
   pendingEmail?: string | null;
   emailChangeToken?: string | null;
   emailChangeExpires?: Date | null;
+  isDeleted: boolean;
+  deletedAt?: Date | null;
   createdAt:Date,
   updatedAt:Date
 
@@ -58,6 +60,14 @@ const userSchema = new Schema<IUser>(
     },
 
     emailVerificationExpires: {
+      type: Date,
+      default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
       type: Date,
       default: null,
     },

@@ -1,8 +1,8 @@
 
 import cron from "node-cron";
-import { findOrdersForVerification, incrementVerifyAttempts } from "../modules/order/order.repo";
-import { verifyPaystackPayment } from "../utils/paystack";
-import { successWorker,failureWorker } from "../modules/webhook/webhook.services";
+import { findOrdersForVerification, incrementVerifyAttempts } from "@/modules/client/order/order.repo";
+import { verifyPaystackPayment } from "@/utils/paystack";
+import { successWorker,failureWorker } from "@/modules/client/webhook/webhook.services";
 import { logger } from "../configs/logger.config";
 
 export const paymentVerificationCron = () => {

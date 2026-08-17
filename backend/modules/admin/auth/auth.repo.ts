@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-import { Admin, IAdmin } from "../../../models/admin.model";
+import { Admin, IAdmin } from "@/models/admin.model";
 import {
   AdminToken,
   IAdminToken,
-} from "../../../models/admin.token.model";
+} from "@/models/admin.token.model";
 
 
 export const createAdmin = async (

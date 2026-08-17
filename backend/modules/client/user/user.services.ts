@@ -1,6 +1,6 @@
-import { findUserById, saveUser, findUserByPendingEmail } from "../auth/auth.repo";
-import { AppError } from "../../utils/appError";
-import { sendEmail } from "../../utils/email";
+import { findUserById, saveUser, findUserByPendingEmail,findUserByEmail } from "@/modules/client/auth/auth.repo";
+import { AppError } from "@/utils/appError";
+import { sendEmail } from "@/utils/email";
 import crypto from "crypto";
 
 const hashToken = (token: string) => crypto.createHash("sha256").update(token).digest("hex");
@@ -38,6 +38,10 @@ export const changeEmailService = async (userId: string, currentPassword: string
   const isMatch = await user.comparePassword(currentPassword);
   if (!isMatch) throw new AppError("Incorrect password", 401);
   if (user.email === newEmail) throw new AppError("This is already your email", 400);
+  const existingUser = await findUserByEmail(newEmail);
+if (existingUser) {
+  throw new AppError("Email is already in use", 400);
+}
 
   const rawToken = generateOTP();
   const hashedToken = hashToken(rawToken);
@@ -53,6 +57,36 @@ export const changeEmailService = async (userId: string, currentPassword: string
     html: `
       <h2>Email Change Verification</h2>
       <p>Your verification code is:</p>
+      <h1>${rawToken}</h1>
+      <p>This code expires in 1 hour.</p>
+    `,
+  });
+};
+export const resendChangeEmailOtpService = async (email: string) => {
+  const user = await findUserByPendingEmail(email);
+
+  if (!user) {
+    throw new AppError("Invalid request", 400);
+  }
+
+  if (!user.pendingEmail) {
+    throw new AppError("No pending email change found", 400);
+  }
+
+  const rawToken = generateOTP();
+  const hashedToken = hashToken(rawToken);
+
+  user.emailChangeToken = hashedToken;
+  user.emailChangeExpires = new Date(Date.now() + 60 * 60 * 1000);
+
+  await saveUser(user);
+
+  await sendEmail({
+    to: user.pendingEmail,
+    subject: "Confirm Email Change",
+    html: `
+      <h2>Email Change Verification</h2>
+      <p>Your new verification code is:</p>
       <h1>${rawToken}</h1>
       <p>This code expires in 1 hour.</p>
     `,

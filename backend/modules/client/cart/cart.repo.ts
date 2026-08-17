@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Cart } from "../../models/cart.model";
+import { Cart } from "@/models/cart.model";
 
 export const findCartByUserId = async (userId: string) => {
   return Cart.findOne({

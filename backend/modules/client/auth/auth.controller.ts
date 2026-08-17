@@ -15,7 +15,7 @@ import {
   forgotPasswordService,
   resendForgotPasswordTokenService,
   resetPasswordService,
-} from "./auth.services";
+} from "@/modules/client/auth/auth.services";
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.validatedBody;

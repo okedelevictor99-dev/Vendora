@@ -1,7 +1,7 @@
-import { Admin } from "../models/admin.model";
+import { Admin } from "@/models/admin.model";
 
-import { env } from "../configs/env";
-import { logger } from "../configs/logger.config";
+import { env } from "@/configs/env";
+import { logger } from "@/configs/logger.config";
 
 export const seedSuperAdmin =
   async () => {

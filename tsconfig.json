@@ -4,8 +4,14 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
 
-    "rootDir": "./src",
+    "rootDir": "backend",
     "outDir": "./dist",
+
+    "baseUrl": "./backend",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "ignoreDeprecations": "6.0",
 
     "strict": true,
     "esModuleInterop": true,
@@ -17,6 +23,6 @@
     "resolvePackageJsonImports": false,
     "resolveJsonModule": false
   },
-  "include": ["src"],
+  "include": ["backend"],
   "exclude": ["dist"]
 }

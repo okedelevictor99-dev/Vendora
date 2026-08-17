@@ -10,14 +10,14 @@ import {
   adminForgotPassword,
   resendAdminForgotPassword,
   adminResetPassword,
-} from "./auth.controller";
+} from "@/modules/admin/auth/auth.controller";
 
 import {
   admin,
-} from "../../../middlewares/admin.middleware";
-import { superAdmin } from "../../../middlewares/superAdmin.middleware";
+} from "@/middlewares/admin.middleware";
+import { superAdmin } from "@/middlewares/superAdmin.middleware";
 
-import { validate } from "../../../middlewares/validate.middleware";
+import { validate } from "@/middlewares/validate.middleware";
 
 import {
   sendAdminVerificationSchema,
@@ -27,7 +27,7 @@ import {
   forgotPasswordSchema,
   resendForgotPasswordTokenSchema,
   resetPasswordSchema,
-} from "./auth.validation";
+} from "@/modules/admin/auth/auth.validation";
 
 const router = Router();
 

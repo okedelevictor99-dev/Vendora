@@ -11,10 +11,10 @@ import {
   forgotPassword,
   resendForgotPasswordToken,
   resetPassword,
-} from "../auth/auth.controller";
+} from "@/modules/client/auth/auth.controller";
 
 
-import { validate } from "../../middlewares/validate.middleware";
+import { validate } from "@/middlewares/validate.middleware";
 import{
   signupSchema,
   verifyEmailSchema,
@@ -23,10 +23,10 @@ import{
   forgotPasswordSchema,
   resendForgotPasswordTokenSchema,
   resetPasswordSchema
-} from "../auth/auth.validation";
+} from "@/modules/client/auth/auth.validation";
 
 
-import { user } from "../../middlewares/user.middleware";
+import { user } from "@/middlewares/user.middleware";
 
 const router = Router();
 

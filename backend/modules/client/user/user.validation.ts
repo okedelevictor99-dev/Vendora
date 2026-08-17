@@ -49,3 +49,10 @@ export const changePasswordSchema = z
     token: tokenSchema,
   })
   .strict();
+
+export const resendChangeEmailOtpSchema = z
+  .object({
+    email: emailSchema
+  })
+  .strict();
+

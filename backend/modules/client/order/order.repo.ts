@@ -1,9 +1,9 @@
 // order.repo.ts
 import mongoose from "mongoose";
-import { Order, IOrder,OrderStatus,RefundStatus } from "../../models/order.model";
-import { Product } from "../../models/product.model";
-import { AppError } from "../../utils/appError";
-import { PaginationOptions, getSkip } from "../../utils/pagination";
+import { Order, IOrder } from "@/models/order.model";
+import { Product } from "@/models/product.model";
+import { AppError } from "@/utils/appError";
+import { PaginationOptions, getSkip } from "@/utils/pagination";
 
 export const createOrder = async (
   data: Partial<IOrder>,
@@ -245,10 +245,6 @@ export const incrementVerifyAttempts = async (
 
 
 
-export interface AdminOrderFilters {
-  status?: OrderStatus;
-  refundStatus?: RefundStatus;
-}
 
 
 
@@ -281,69 +277,4 @@ export const findOrderByIdAndUserId = async (
 };
 
 
-
-export const findAllOrders = async (
-  options: PaginationOptions,
-  filters: AdminOrderFilters = {}
-) => {
-  const skip = getSkip(options);
-
-  const query: Record<string, any> = {};
-
-  if (filters.status) {
-    query.status = filters.status;
-  }
-
-  if (filters.refundStatus) {
-    query.refundStatus = filters.refundStatus;
-  }
-
-  const [orders, total] = await Promise.all([
-    Order.find(query)
-      .populate("user", "email firstName lastName")
-      .populate("items.product", "name images price")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(options.limit)
-      .lean(),
-    Order.countDocuments(query),
-  ]);
-
-  return { orders, total };
-};
-
-export const findOrderByIdForAdmin = async (orderId: string) => {
-  return Order.findById(orderId)
-    .populate("user", "email firstName lastName")
-    .populate("items.product", "name images price")
-    .lean();
-};
-
-
-
-export const markOrderAsShipped = async (reference: string) => {
-  return Order.findOneAndUpdate(
-    { reference, status: "paid" }, 
-    {
-      $set: {
-        status: "shipped",
-        shippedAt: new Date(),
-      },
-    },
-    { new: true }
-  );
-};
-
-export const markOrderAsDelivered = async (reference: string) => {
-  return Order.findOneAndUpdate(
-    { reference, status: "shipped" }, 
-    {
-      $set: {
-        status: "delivered",
-        deliveredAt: new Date(),
-      },
-    },
-    { new: true }
-  );
-};
 

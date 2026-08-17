@@ -5,8 +5,8 @@ import {
   emailSchema,
   passwordSchema,
   tokenSchema,
-} from "../../client/auth/auth.validation";
-import { nameSchema } from "../../client/user/user.validation";
+} from "@/modules/client/auth/auth.validation";
+import { nameSchema } from "@/modules/client/user/user.validation";
 
 
 export const sendAdminVerificationSchema =

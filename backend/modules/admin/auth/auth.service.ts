@@ -11,16 +11,16 @@ import {
   findAdminToken,
   revokeAdminToken,
   revokeAllAdminTokens,
-} from "./auth.repo";
+} from "@/modules/admin/auth/auth.repo";
 
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from "../../../utils/jwt";
+} from "@/utils/jwt";
 
-import { sendEmail } from "../../../utils/email";
-import { AppError } from "../../../utils/appError";
+import { sendEmail } from "@/utils/email";
+import { AppError } from "@/utils/appError";
 
 const generateOTP = (): string => crypto.randomInt(100000, 999999).toString();
 

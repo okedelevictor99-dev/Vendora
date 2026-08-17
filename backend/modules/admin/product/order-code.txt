@@ -1,0 +1,369 @@
+====================
+./order-code.txt
+====================
+
+====================
+./product.controller.ts
+====================
+import { asyncHandler } from "@/utils/asyncHandler";
+import { Response,Request } from "express";
+import { sendResponse } from "@/utils/response";
+import { createProductService,getAdminProductByIdService,getAdminProductsService,updateProductService,activateProductService,deactivateProductService } from "./product.service";
+
+
+export const createProduct = asyncHandler(async (req: Request, res: Response) => {
+  const data = req.validatedBody;
+  const product = await createProductService(data);
+  return sendResponse(res, 201, "Product created successfully", product);
+});
+
+export const getAdminProducts = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await getAdminProductsService(req.query);
+
+    return sendResponse(
+      res,
+      200,
+      "Products fetched successfully",
+      result
+    );
+  }
+);
+export const getAdminProductById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.validatedParams;
+  const product = await getAdminProductByIdService(id);
+  return sendResponse(res, 200, "Product fetched successfully", product);
+});
+export const updateProduct = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.validatedParams;
+  const data = req.validatedBody;
+  const product = await updateProductService(id, data);
+  return sendResponse(res, 200, "Product updated successfully", product);
+});
+
+export const deactivateProduct = asyncHandler(
+  async (req: Request, res: Response) => {
+     const { id } = req.validatedParams;
+    const result = await deactivateProductService(id);
+
+    return sendResponse(
+      res,
+      200,
+      "Product deactivated successfully",
+      result
+    );
+  }
+);
+
+export const activateProduct = asyncHandler(
+  async (req: Request, res: Response) => {
+     const { id } = req.validatedParams;
+    const result = await activateProductService(id);
+
+    return sendResponse(
+      res,
+      200,
+      "Product activated successfully",
+      result
+    );
+  }
+);
+
+====================
+./product.repo.ts
+====================
+import { Product,IProduct } from "@/models/product.model";
+
+
+export const updateProductById = (id: string, data: Partial<IProduct>) => {
+  return Product.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  });
+};
+export const createProduct = (data: Partial<IProduct>) => {
+  return Product.create(data);
+};
+
+export const deactivateProductById = (id: string) => {
+  return Product.findOneAndUpdate(
+    {
+      _id: id,
+      isActive: true,
+    },
+    {
+      isActive: false,
+    },
+    {
+      new: true,
+    }
+  );
+};
+
+export const activateProductById = (id: string) => {
+  return Product.findOneAndUpdate(
+    {
+      _id: id,
+      isActive: false,
+    },
+    {
+      isActive: true,
+    },
+    {
+      new: true,
+    }
+  );
+};
+export const findProducts = async (params: {
+  page: number;
+  limit: number;
+  category?: string;
+  search?: string;
+  isActive?:boolean
+}) => {
+  const { page, limit, category, search,isActive} = params;
+
+  const skip = (page - 1) * limit;
+
+  const filter: any = {}
+  if (isActive !== undefined) {
+    filter.isActive = isActive;
+  }
+
+  if (category) {
+    filter.category = category;
+  }
+
+  if (search) {
+    filter.name = { $regex: search, $options: "i" };
+  }
+
+  const products = await Product.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Product.countDocuments(filter);
+
+  return {
+    products,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+export const findProductById = (id: string) => {
+  return Product.findById(id);
+};
+
+====================
+./product.routes.ts
+====================
+import Router from "express"
+
+import { validate } from "@/middlewares/validate.middleware";
+import { admin } from "@/middlewares/admin.middleware";
+import { productQuerySchema,productIdSchema,createProductSchema,updateProductSchema, } from "./product.validation";
+import { getAdminProductById,getAdminProducts,updateProduct,createProduct,activateProduct,deactivateProduct } from "./product.controller";
+
+const router=Router()
+router.get(
+  "/",
+  admin,
+  validate({ query: productQuerySchema }),
+  getAdminProducts
+);
+router.get(
+  "/:id",
+  admin,
+  validate({ params: productIdSchema }),
+  getAdminProductById
+);
+
+router.post(
+  "/",
+  admin,
+  validate({ body: createProductSchema }),
+  createProduct
+);
+
+router.put(
+  "/:id",
+  admin,
+  validate({
+    params: productIdSchema,
+    body: updateProductSchema,
+  }),
+  updateProduct
+);
+
+router.patch(
+  "/:id/deactivate",
+  admin,
+  validate({ params: productIdSchema }),
+  deactivateProduct
+);
+
+router.patch(
+  "/:id/activate",
+  admin,
+  validate({ params: productIdSchema }),
+  activateProduct
+);
+export default router;
+====================
+./product.service.ts
+====================
+import { AppError } from "@/utils/appError";
+import { createProduct,findProducts,findProductById,updateProductById,activateProductById,deactivateProductById } from "./product.repo";
+
+export const createProductService = async (data: any) => {
+  const product = await createProduct(data);
+  return product;
+};
+export const getAdminProductsService = async (query: any) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+  const category = query.category;
+  const search = query.search;
+  const status = query.status;
+
+  let isActive: boolean | undefined;
+
+  if (status === "active") {
+    isActive = true;
+  } else if (status === "inactive") {
+    isActive = false;
+  }
+
+  return await findProducts({
+    page,
+    limit,
+    category,
+    search,
+    isActive,
+  });
+};
+
+export const getAdminProductByIdService = async (id: string) => {
+  const product = await findProductById(id);
+
+  if (!product) {
+    throw new AppError("Product not found", 404);
+  }
+
+  return product;
+};
+
+export const updateProductService = async (id: string, data: any) => {
+  const product = await updateProductById(id, data);
+  if (!product) throw new AppError("Product not found", 404);
+  return product;
+};
+
+export const deactivateProductService = async (id: string) => {
+  const existingProduct = await findProductById(id);
+
+  if (!existingProduct) {
+    throw new AppError("Product not found", 404);
+  }
+
+  if (!existingProduct.isActive) {
+    throw new AppError("Product is already inactive", 400);
+  }
+
+  return await deactivateProductById(id);
+};
+
+export const activateProductService = async (id: string) => {
+  const existingProduct = await findProductById(id);
+
+  if (!existingProduct) {
+    throw new AppError("Product not found", 404);
+  }
+
+  if (existingProduct.isActive) {
+    throw new AppError("Product is already active", 400);
+  }
+
+  return await activateProductById(id);
+};
+====================
+./product.validation.ts
+====================
+import {z} from "zod"
+
+const name = z
+  .string()
+  .min(2, "Product name must be at least 2 characters")
+  .max(100);
+
+const description = z
+  .string()
+  .min(10, "Description must be at least 10 characters")
+  .max(2000);
+
+const price = z
+  .number()
+  .min(0, "Price cannot be negative");
+
+const stock = z
+  .number()
+  .int("Stock must be an integer")
+  .min(0, "Stock cannot be negative");
+
+const category = z
+  .string()
+  .min(2, "Category is required")
+  .max(50);
+
+const images = z
+  .array(z.string().url("Each image must be a valid URL"))
+  .optional();
+
+
+
+
+export const createProductSchema = z
+  .object({
+    name,
+    description,
+    price,
+    stock,
+    category,
+    images,
+  })
+  .strict();
+
+export const updateProductSchema = z
+  .object({
+    name: name.optional(),
+    description: description.optional(),
+    price: price.optional(),
+    stock: stock.optional(),
+    category: category.optional(),
+    images: images,
+    isActive: z.boolean().optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
+
+
+export const productIdSchema = z
+  .object({
+    id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid product ID"),
+  })
+  .strict();
+
+export const deleteProductSchema = productIdSchema;
+
+export const productQuerySchema = z.object({
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  category: z.string().optional(),
+  search: z.string().optional(),
+  status: z.enum(["active", "inactive"]).optional(),
+});

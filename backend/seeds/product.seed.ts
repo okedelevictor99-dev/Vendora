@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { faker } from "@faker-js/faker";
-import { Product } from "../models/product.model";
+import { Product } from "@/models/product.model";
 import dotenv from "dotenv"
 
 dotenv.config()

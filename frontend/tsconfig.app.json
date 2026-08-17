@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src-new/*"]
+    },
+    "ignoreDeprecations": "6.0",
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "src-new"
+, "src-new/features/routes/adminRoutes/AdminRoutes.tsx"    // "src-new/components/ui/button.tsx",
+    // "src-new/components/ui/input.tsx",
+    // "src-new/components/ui/confirmModal.tsx",
+    // "src-new/components/ui/fullScreenLoader.tsx",
+    // "src-new/components/ui/otpInput.tsx",
+    // "src-new/components/layout/customerLayout.tsx",
+    // "src-new/components/layout/pageTransition.tsx"
+  ]
+}

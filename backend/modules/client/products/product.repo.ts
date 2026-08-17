@@ -1,8 +1,6 @@
-import { Product, IProduct } from "../../models/product.model";
+import { Product, IProduct } from "@/models/product.model";
 
-export const createProduct = (data: Partial<IProduct>) => {
-  return Product.create(data);
-};
+
 export const findProducts = async (params: {
   page: number;
   limit: number;
@@ -43,45 +41,12 @@ export const findProducts = async (params: {
   };
 };
 
-export const updateProductById = (id: string, data: Partial<IProduct>) => {
-  return Product.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
-};
+
 export const findProductById = (id: string) => {
   return Product.findById(id);
 };
 
-export const deactivateProductById = (id: string) => {
-  return Product.findOneAndUpdate(
-    {
-      _id: id,
-      isActive: true,
-    },
-    {
-      isActive: false,
-    },
-    {
-      new: true,
-    }
-  );
-};
 
-export const activateProductById = (id: string) => {
-  return Product.findOneAndUpdate(
-    {
-      _id: id,
-      isActive: false,
-    },
-    {
-      isActive: true,
-    },
-    {
-      new: true,
-    }
-  );
-};
 export const findActiveProductById = (id: string) => {
   return Product.findOne({
     _id: id,

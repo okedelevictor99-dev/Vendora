@@ -2,10 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 import { env } from "../configs/env";
-import { AppError } from "../utils/appError";
-import { asyncHandler } from "../utils/asyncHandler";
+import { AppError } from "@/utils/appError";
+import { asyncHandler } from "@/utils/asyncHandler";
 
-import { findAdminById } from "../modules/admin/auth/auth.repo";
+import { findAdminById } from "@/modules/admin/auth/auth.repo";
 
 interface AdminJwtPayload {
   adminId: string;

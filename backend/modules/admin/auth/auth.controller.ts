@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { sendResponse } from "../../../utils/response";
-import { AppError } from "../../../utils/appError";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { sendResponse } from "@/utils/response";
+import { AppError } from "@/utils/appError";
 
 import {
   sendAdminVerificationService,
@@ -14,7 +14,7 @@ import {
   adminForgotPasswordService,
   resendAdminForgotPasswordService,
   adminResetPasswordService,
-} from "./auth.service";
+} from "@/modules/admin/auth/auth.service";
 
 export const sendAdminVerification = asyncHandler(async (req: Request, res: Response) => {
   const { name, email } = req.validatedBody;

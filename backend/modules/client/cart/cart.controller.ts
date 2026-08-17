@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import { asyncHandler } from "../../utils/asyncHandler";
-import { sendResponse } from "../../utils/response";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { sendResponse } from "@/utils/response";
 import {
   getCartService,
   addToCartService,
@@ -9,7 +9,7 @@ import {
   decreaseQuantityService,
   removeFromCartService,
   clearCartService,
-} from "./cart.service";
+} from "@/modules/client/cart/cart.service";
 
 export const addToCart = asyncHandler(async (req: Request, res: Response) => {
   const { productId, quantity } = req.validatedBody;

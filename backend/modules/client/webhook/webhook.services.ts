@@ -6,8 +6,8 @@ import {
   markOrderAsPaid,
   releaseReservedStock,
   markOrderAsFailed,
-} from "../order/order.repo";
-import { Order } from "../../models/order.model";
+} from "@/modules/client/order/order.repo";
+import { Order } from "@/models/order.model";
 
 export const successWorker = async (reference: string) => {
   const order = await findOrderByReference(reference);

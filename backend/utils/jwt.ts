@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { env } from '../configs/env';
 import {StringValue} from 'ms'
-import { AppError } from './appError';
+import { AppError } from "@/utils/appError";
 
 export interface JwtPayload {
   userId?: string;

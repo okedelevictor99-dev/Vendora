@@ -1,13 +1,13 @@
-import { AppError } from "../../utils/appError";
-import { getPopulatedCart } from "./cart.repo";
-import { findProductById } from "../products/product.repo";
-import { formatCart } from "../../utils/formatCart";
+import { AppError } from "@/utils/appError";
+import { getPopulatedCart } from "@/modules/client/cart/cart.repo";
+import { findProductById } from "@/modules/client/products/product.repo";
+import { formatCart } from "@/utils/formatCart";
 
 import {
   findCartByUserId,
   createCart,
   saveCart,
-} from "./cart.repo";
+} from "@/modules/client/cart/cart.repo";
 
 const getCartAndItem = async (userId: string, productId: string) => {
   const cart = await findCartByUserId(userId);

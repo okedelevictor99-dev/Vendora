@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import { findExpiredInitiatedOrders,releaseReservedStock } from "../modules/order/order.repo";
+import { findExpiredInitiatedOrders,releaseReservedStock } from "@/modules/client/order/order.repo";
 import { logger } from "../configs/logger.config";
 
 export const stockExpiryCron = () => {

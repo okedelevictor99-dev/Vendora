@@ -11,16 +11,16 @@ import {
   findToken,
   revokeToken,
   revokeAllUserTokens,
-} from './auth.repo';
+} from "@/modules/client/auth/auth.repo";
 
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from '../../utils/jwt';
+} from "@/utils/jwt";
 
-import { sendEmail } from '../../utils/email';
-import { AppError } from '../../utils/appError';
+import { sendEmail } from "@/utils/email";
+import { AppError } from "@/utils/appError";
 
 const generateOTP = (): string => crypto.randomInt(100000, 999999).toString();
 
@@ -96,6 +96,7 @@ export const verifyEmailService = async (email: string, token: string) => {
 export const resendVerificationTokenService = async (email: string) => {
   const user = await findUserByEmail(email);
   if (!user) throw new AppError('User not found', 404);
+   if (user.isDeleted) throw new AppError('User not found', 404);
   if (user.isEmailVerified) throw new AppError('Email already verified', 400);
 
   const rawVerificationToken = generateOTP();
@@ -122,6 +123,7 @@ export const loginService = async (data: { email: string; password: string; devi
 
   const isPasswordValid = await user.comparePassword(data.password);
   if (!isPasswordValid) throw new AppError('Invalid credentials', 401);
+  if (user.isDeleted) throw new AppError('Invalid credentials', 401);
   if (!user.isEmailVerified) throw new AppError('Please verify your email before logging in', 403);
 
   const payload = { userId: user._id.toString() };
@@ -153,6 +155,7 @@ export const refreshTokenService = async (refreshToken: string) => {
 
   const user = await findUserById(decoded.userId);
   if (!user) throw new AppError('User not found', 404);
+  if (user.isDeleted) throw new AppError('User no longer exists.', 401);
 
   await revokeToken(hashed);
 
@@ -183,6 +186,7 @@ export const logoutAllService = async (userId: string) => {
 export const forgotPasswordService = async (email: string) => {
   const user = await findUserByEmail(email);
   if (!user) throw new AppError('User not found', 404);
+   if (user.isDeleted) throw new AppError('User not found', 404);
 
   const rawResetToken = generateOTP();
   user.passwordResetToken = hashToken(rawResetToken);
@@ -204,6 +208,7 @@ export const forgotPasswordService = async (email: string) => {
 export const resendForgotPasswordTokenService = async (email: string) => {
   const user = await findUserByEmail(email);
   if (!user) throw new AppError('User not found', 404);
+   if (user.isDeleted) throw new AppError('User not found', 404);
 
   const rawResetToken = generateOTP();
   user.passwordResetToken = hashToken(rawResetToken);
@@ -225,6 +230,7 @@ export const resendForgotPasswordTokenService = async (email: string) => {
 export const resetPasswordService = async (email: string, token: string, newPassword: string) => {
   const user = await findUserByEmail(email);
   if (!user) throw new AppError('User not found', 404);
+   if (user.isDeleted) throw new AppError('User not found', 404);
 
   const hashedToken = hashToken(token);
 

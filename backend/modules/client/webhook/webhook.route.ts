@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { paystackWebhookController } from "./webhook.controller";
+import { paystackWebhookController } from "@/modules/client/webhook/webhook.controller";
 import express from "express"
 
 const router = Router();

@@ -1,12 +1,12 @@
 // user.controller.ts
 
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { sendResponse } from "../../utils/response";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { sendResponse } from "@/utils/response";
 
 import {
-  changeNameService, changePasswordService,changeEmailService,verifyChangeEmailService,getUserProfileService
-} from "../user/user.services";
+  changeNameService, changePasswordService,changeEmailService,verifyChangeEmailService,getUserProfileService,resendChangeEmailOtpService
+} from "@/modules/client/user/user.services";
 
 export const changeName = asyncHandler(async (req: Request, res: Response) => {
   const { name } = req.validatedBody;
@@ -38,6 +38,17 @@ export const changeEmail = asyncHandler(async (req: Request, res: Response) => {
     res,
     200,
     "Verification code sent to new email. Please confirm to complete email change."
+  );
+});
+export const resendChangeEmailOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  await resendChangeEmailOtpService(email);
+
+  return sendResponse(
+    res,
+    200,
+    "Verification code sent successfully"
   );
 });
 export const verifyChangeEmail = asyncHandler(async (req: Request, res: Response) => {

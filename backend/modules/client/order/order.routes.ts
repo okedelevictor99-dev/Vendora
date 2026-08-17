@@ -1,27 +1,22 @@
 // src/modules/order/order.routes.ts
 
 import { Router } from "express";
-import { validate } from "../../middlewares/validate.middleware";
-import { user } from "../../middlewares/user.middleware";
-import { admin } from "../../middlewares/admin.middleware";
+import { validate } from "@/middlewares/validate.middleware";
+import { user } from "@/middlewares/user.middleware";
+import { admin } from "@/middlewares/admin.middleware";
 import {
   checkout,
   manualVerifyOrder,
-  markOrderRefunded,
   getUserOrders,
   getUserOrderById,
-  getAdminOrders,
-  getAdminOrderById,
-  markOrderAsShipped,
-  markOrderAsDelivered,
-} from "./order.controller";
+} from "@/modules/client/order/order.controller";
 import {
   referenceParamSchema,
   updateOrderToRefundedSchema,
   paginationSchema,
   mongoIdSchema,
   adminOrdersQuerySchema,
-} from "./order.validation";
+} from "@/modules/client/order/order.validation";
 
 const router = Router();
 
@@ -40,21 +35,6 @@ router.get(
 );
 
 router.get(
-  "/admin/",
-  admin,
-  validate({ query: adminOrdersQuerySchema }),
-  getAdminOrders
-);
-
-router.get(
-  "/admin/:id",
-  admin,
-  validate({ params: mongoIdSchema }),
-  getAdminOrderById
-);
-
-
-router.get(
   "/",
   user,
   validate({ query: paginationSchema }),
@@ -68,30 +48,6 @@ router.get(
   getUserOrderById
 );
 
-
-router.patch(
-  "/refund/:reference",
-  admin,
-  validate({
-    params: referenceParamSchema,
-    body: updateOrderToRefundedSchema,
-  }),
-  markOrderRefunded
-);
-
-router.patch(
-  "/ship/:reference",
-  admin,
-  validate({ params: referenceParamSchema }),
-  markOrderAsShipped
-);
-
-router.patch(
-  "/deliver/:reference",
-  admin,
-  validate({ params: referenceParamSchema }),
-  markOrderAsDelivered
-);
 
 
 export default router;
