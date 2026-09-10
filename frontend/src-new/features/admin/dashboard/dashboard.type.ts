@@ -21,6 +21,8 @@ export interface DashboardStats {
   revenue: number;
   totalOrders: number;
   totalUsers: number;
+  activeUsers: number;
+  deletedUsers: number;
   recentOrders: DashboardRecentOrder[];
   lowStockCount: number;
   lowStockProducts: DashboardLowStockProduct[];

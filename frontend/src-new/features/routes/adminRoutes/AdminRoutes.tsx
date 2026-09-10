@@ -7,10 +7,11 @@ import AdminDashboard from "@/features/admin/dashboard/dashboard.pages/AdminDash
 import AdminProductForm from "@/features/admin/product/product.pages/AdminProductForm";
 import AdminManagement from "@/features/admin/auth/auth.pages/AdminManagement";
 import AdminProducts from "@/features/admin/product/product.pages/AdminProducts";
-import AdminUsers from "@/features/client/user/pages/AccountSettings";
-import AdminAccount from "@/features/admin/auth/auth.pages/AdminAccount";
+import AdminUsers from "@/features/admin/user/user.pages/AdminUser"
+import AdminUserDetails from "@/features/admin/user/user.pages/AdminUserDetails";
 import { RequireAdmin } from "./RequireAdmin";
 import AdminOrders from "@/features/admin/order/order.pages/AdminOrder";
+import AdminAccount from "@/features/admin/account/account.pages/AdminAccount";
 import AdminOrderDetails from "@/features/admin/order/order.pages/AdminOrderDetails";
 
 
@@ -26,7 +27,8 @@ const AdminRoutes = () => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
-          {/* <Route path="users" element={<AdminUsers />} /> */}
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="user/:id" element={<AdminUserDetails />} />
           <Route path="orders/:id" element={<AdminOrderDetails />} />
           <Route path="management" element={<AdminManagement />} />
           <Route path="account" element={<AdminAccount />} />

@@ -69,7 +69,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <MetricCard
           label="Revenue"
           value={formatCurrency(stats?.revenue ?? 0)}
@@ -82,13 +82,23 @@ const AdminDashboard = () => {
           isLoading={isLoading}
         />
         <MetricCard
+          label="Low Stock Products"
+          value={String(stats?.lowStockCount ?? 0)}
+          isLoading={isLoading}
+        />
+        <MetricCard
           label="Total Users"
           value={String(stats?.totalUsers ?? 0)}
           isLoading={isLoading}
         />
         <MetricCard
-          label="Low Stock Products"
-          value={String(stats?.lowStockCount ?? 0)}
+          label="Active Users"
+          value={String(stats?.activeUsers ?? 0)}
+          isLoading={isLoading}
+        />
+        <MetricCard
+          label="Deleted Users"
+          value={String(stats?.deletedUsers ?? 0)}
           isLoading={isLoading}
         />
       </div>

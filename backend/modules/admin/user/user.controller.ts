@@ -1,7 +1,7 @@
 import { asyncHandler } from "@/utils/asyncHandler";
 import { Response, Request } from "express";
 import { sendResponse } from "@/utils/response";
-import { getAdminUsersService, getAdminUserByIdService, deleteUserService } from "./user.service";
+import { getAdminUsersService, getAdminUserByIdService, deleteUserService,restoreUserService } from "./user.service";
 
 export const getAdminUsers = asyncHandler(
   async (req: Request, res: Response) => {
@@ -31,6 +31,19 @@ export const deleteUser = asyncHandler(
       res,
       200,
       "User deleted successfully",
+      result
+    );
+  }
+);
+export const restoreUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.validatedParams;
+    const result = await restoreUserService(id);
+
+    return sendResponse(
+      res,
+      200,
+      "User restored successfully",
       result
     );
   }

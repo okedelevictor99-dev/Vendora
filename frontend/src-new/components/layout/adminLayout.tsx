@@ -6,7 +6,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { useAdminAuthContext } from "@/context/adminAuthContext";
 import { useAdminAuth } from "@/features/admin/auth/auth.hook";
-import FullScreenLoader from "../../components/ui/fullScreenLoader";
+import FullScreenLoader from "../ui/fullScreenLoader";
 
 const navItems = [
   { label: "Dashboard", to: "/admin/dashboard" },

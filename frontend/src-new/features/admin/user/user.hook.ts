@@ -24,21 +24,21 @@ export const useAdminUserMutations = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
-  const deactivateMutation = useMutation({
-    mutationFn: (id: string) => adminUserApi.deactivateUser(id),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminUserApi.deleteUser(id),
     onSuccess: invalidateUsers,
   });
 
-  const activateMutation = useMutation({
-    mutationFn: (id: string) => adminUserApi.activateUser(id),
+  const restoreMutation = useMutation({
+    mutationFn: (id: string) => adminUserApi.restoreUser(id),
     onSuccess: invalidateUsers,
   });
 
   return {
-    deactivateUser: deactivateMutation.mutateAsync,
-    isDeactivatingUser: deactivateMutation.isPending,
+    deleteUser: deleteMutation.mutateAsync,
+    isDeletingUser: deleteMutation.isPending,
 
-    activateUser: activateMutation.mutateAsync,
-    isActivatingUser: activateMutation.isPending,
+    restoreUser: restoreMutation.mutateAsync,
+    isRestoringUser: restoreMutation.isPending,
   };
 };

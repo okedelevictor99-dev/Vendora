@@ -138,7 +138,6 @@ const ResetPassword = () => {
               value={code}
               onChange={(value) => {
                 setCode(value);
-                setCodeTouched(true);
               }}
               error={codeTouched && code.length !== 6 ? "Enter the 6-digit code" : undefined}
             />

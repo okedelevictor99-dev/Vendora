@@ -211,7 +211,7 @@ export const findOrderByIdForAdmin = async (orderId: string) => {
 
 export const markOrderAsShipped = async (reference: string) => {
   return Order.findOneAndUpdate(
-    { reference, status: "paid" }, 
+    { reference, status: "paid" },
     {
       $set: {
         status: "shipped",
@@ -219,12 +219,12 @@ export const markOrderAsShipped = async (reference: string) => {
       },
     },
     { new: true }
-  );
+  ).populate("user", "email");
 };
 
 export const markOrderAsDelivered = async (reference: string) => {
   return Order.findOneAndUpdate(
-    { reference, status: "shipped" }, 
+    { reference, status: "shipped" },
     {
       $set: {
         status: "delivered",
@@ -232,27 +232,27 @@ export const markOrderAsDelivered = async (reference: string) => {
       },
     },
     { new: true }
-  );
+  ).populate("user", "email");
 };
+
 export const markOrderAsRefunded = async (
   reference: string,
-  note?: string,
+  note?: string
 ) => {
   return Order.findOneAndUpdate(
-    { 
-      reference, 
-      status: "cannot_fulfill", 
-      refundStatus: "pending",  
+    {
+      reference,
+      status: "cannot_fulfill",
+      refundStatus: "pending",
     },
-    { 
-      $set: { 
+    {
+      $set: {
         refundStatus: "refunded",
         ...(note && { refundNote: note }),
         refundedAt: new Date(),
-      } 
+      },
     },
     { new: true }
-  );
+  ).populate("user", "email");
 };
-
 

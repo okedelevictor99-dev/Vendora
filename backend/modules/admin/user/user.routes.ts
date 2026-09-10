@@ -3,7 +3,7 @@ import Router from "express";
 import { validate } from "@/middlewares/validate.middleware";
 import { admin } from "@/middlewares/admin.middleware";
 import { userQuerySchema, userIdSchema } from "./user.validation";
-import { getAdminUsers, getAdminUserById, deleteUser } from "./user.controller";
+import { getAdminUsers, getAdminUserById, deleteUser,restoreUser } from "./user.controller";
 
 const router = Router();
 
@@ -26,6 +26,12 @@ router.delete(
   admin,
   validate({ params: userIdSchema }),
   deleteUser
+);
+router.patch(
+  "/:id/restore",
+  admin,
+  validate({ params: userIdSchema }),
+  restoreUser
 );
 
 export default router;

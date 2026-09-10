@@ -56,3 +56,22 @@ export const softDeleteUserById = (id: string) => {
     }
   );
 };
+
+export const restoreUserById = (id: string) => {
+  return User.findOneAndUpdate(
+    {
+      _id: id,
+      isDeleted: true,
+    },
+    {
+      isDeleted: false,
+      deletedAt: null,
+    },
+    {
+      new: true,
+    }
+  );
+};
+export const findDeletedUserById = (id: string) => {
+  return User.findOne({ _id: id, isDeleted: true });
+};

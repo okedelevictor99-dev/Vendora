@@ -33,6 +33,8 @@ export interface IOrder extends Document {
   stockReservationExpiry: Date;
   verifyAttempts: number;
   lastVerifiedAt: Date | null;
+  shippedAt:Date|null
+  deliveredAt:Date|null
   createdAt: Date;
   updatedAt: Date;
 }
@@ -101,6 +103,14 @@ const orderSchema = new Schema<IOrder>(
    },
 
    refundedAt: {
+   type: Date,
+   default: null,
+   },
+    shippedAt: {
+   type: Date,
+   default: null,
+   },
+    deliveredAt: {
    type: Date,
    default: null,
    },

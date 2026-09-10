@@ -1,4 +1,4 @@
-// order.type.ts
+
 import type { Product } from "@/features/client/product/product.type";
 
 export type OrderStatus =

@@ -1,6 +1,8 @@
 import { AppError } from "@/utils/appError";
 import { findUsers, findUserById, softDeleteUserById } from "./user.repo";
 import { revokeAllUserTokens } from "@/modules/client/auth/auth.repo";
+import { findDeletedUserById, restoreUserById } from "./user.repo";
+
 
 export const getAdminUsersService = async (query: any) => {
   const page = Number(query.page) || 1;
@@ -42,4 +44,18 @@ export const deleteUserService = async (id: string) => {
   await revokeAllUserTokens(id);
 
   return deletedUser;
+};
+
+
+
+export const restoreUserService = async (id: string) => {
+  const existingUser = await findDeletedUserById(id);
+
+  if (!existingUser) {
+    throw new AppError("User not found or not deleted", 404);
+  }
+
+  const restoredUser = await restoreUserById(id);
+
+  return restoredUser;
 };

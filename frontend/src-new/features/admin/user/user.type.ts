@@ -2,7 +2,10 @@ export interface User {
   _id: string;
   name: string;
   email: string;
-  isActive: boolean;
+  isEmailVerified: boolean;
+  isDeleted: boolean;
+  deletedAt: string | null;
+  pendingEmail?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -11,7 +14,7 @@ export interface AdminUserListParams {
   page?: number;
   limit?: number;
   search?: string;
-  status?: "active" | "inactive";
+  isDeleted?: boolean;
 }
 
 export interface UserListData {

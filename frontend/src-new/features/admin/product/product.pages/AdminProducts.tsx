@@ -71,17 +71,18 @@ const AdminProducts = () => {
   const totalPages = data?.data.totalPages ?? 1;
 
   const updateStatus = (value: string) => {
-    const next = new URLSearchParams(searchParams);
+  const next = new URLSearchParams(searchParams);
 
-    if (value) {
-      next.set("status", value);
-    } else {
-      next.delete("status");
-    }
+  if (value) {
+    next.set("status", value);
+  } else {
+    next.delete("status");
+  }
 
-    setPage(1);
-    setSearchParams(next);
-  };
+  setPage(1);
+  setSearch(""); // Clear search when changing status
+  setSearchParams(next);
+};
 
   const handleConfirmToggle = async () => {
     if (!pendingProduct) return;
