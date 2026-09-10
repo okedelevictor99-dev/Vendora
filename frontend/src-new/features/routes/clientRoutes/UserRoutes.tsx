@@ -18,7 +18,7 @@ import Cart from "@/features/client/cart/cart.pages/cart";
 import Order from "@/features/client/order/order.pages/Order";
 import OrderDetails from "@/features/client/order/order.pages/OrderDetails";
 import PaymentVerifyPage from "@/features/client/order/order.pages/PaymentVerify";
-import AccountSettings from "@/features/client/user/user.pages/AccountSettings"
+import AccountSettingsPage from "@/features/client/user/user.pages/AccountSettings"
 
 const UserRoutes = () => {
   return (
@@ -44,7 +44,7 @@ const UserRoutes = () => {
           <Route path="/dashboard/orders/:id" element={<OrderDetails/>} />
           <Route path="/dashboard/products/:id" element={<CustomerProductDetailsPage />} />
           <Route path="/dashboard/payment/verify" element={<PaymentVerifyPage/>} />
-          <Route path="/dashboard/account" element={<AccountSettings/>}/>
+          <Route path="/dashboard/account" element={<AccountSettingsPage/>}/>
         </Route>
       </Route>
     </Routes>
