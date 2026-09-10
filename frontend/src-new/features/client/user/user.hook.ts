@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as userApi from "@/features/client/user/user.api";
-import { useAuthContext } from "@/context/authContext";
+
 import type {
   ChangeNamePayload,
   ChangeEmailPayload,

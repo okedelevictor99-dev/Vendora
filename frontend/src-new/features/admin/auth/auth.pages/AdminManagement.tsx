@@ -6,8 +6,7 @@ import { isAxiosError } from "axios";
 import { z } from "zod";
 
 import {
-  sendAdminVerificationSchema,
-  nameSchema,
+  sendAdminVerificationSchema
 } from "@/features/admin/auth/auth.validation";
 import { emailSchema } from "@/features/client/auth/auth.validation";
 import { useAdminAuth } from "@/features/admin/auth/auth.hook";
