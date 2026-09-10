@@ -10,9 +10,9 @@ export const errorMiddleware = (
 ) => {
   let error = err;
   if (!(error instanceof AppError)) {
-    error = new AppError('Internal Server Error', 500);
-  }
-
+  console.error("UNEXPECTED ERROR:", err);
+  error = new AppError("Internal Server Error", 500);
+}
   const statusCode = error.statusCode || 500;
 
   res.status(statusCode).json({
