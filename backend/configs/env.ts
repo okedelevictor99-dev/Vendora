@@ -15,11 +15,7 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().default('7d'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
 
-  SMTP_HOST: z.string().min(1),
-  SMTP_PORT: z.coerce.number(),
-  SMTP_USER: z.string().min(1),
-  SMTP_PASS: z.string().min(1),
-  SMTP_FROM: z.string().min(1),
+  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
 
   CLIENT_URL: z.string().url(),
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
