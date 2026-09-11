@@ -61,15 +61,19 @@ const Order = () => {
             </p>
           )}
 
-          {!isLoading && !isError && orders.length === 0 && (
-            <div className="mt-12 text-center">
-              <p className="text-sm text-[#8B8B85]">You haven't placed any orders yet.</p>
-              <Link to="/dashboard">
-                <Button className="mt-6 min-w-52">Start shopping</Button>
-              </Link>
-            </div>
-          )}
+         {!isLoading && !isError && orders.length === 0 && (
+  <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
+    <p className="text-sm text-[#8B8B85]">
+      You haven't placed any orders yet.
+    </p>
 
+    <Link to="/dashboard">
+      <Button className="mt-6 min-w-52">
+        Start shopping
+      </Button>
+    </Link>
+  </div>
+)}
           {!isLoading && !isError && orders.length > 0 && (
             <>
               <div className="mt-8 flex flex-col gap-4">
