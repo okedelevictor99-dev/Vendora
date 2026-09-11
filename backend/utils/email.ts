@@ -17,7 +17,7 @@ export const sendEmail = async ({
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "My App <onboarding@resend.dev>",
+      from: "Vendora <onboarding@resend.dev>",
       to: [to],
       subject,
       html,
