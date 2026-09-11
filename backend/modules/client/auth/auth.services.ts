@@ -36,6 +36,7 @@ export const signupService = async (data: {
   password: string;
 }) => {
   const existingUser = await findUserByEmail(data.email);
+  if (existingUser?.isDeleted) throw new AppError('Invalid credentials', 401);
   if (existingUser?.isEmailVerified) {
     throw new AppError('Email already exists, proceed to login', 400);
   }
