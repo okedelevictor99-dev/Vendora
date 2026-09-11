@@ -42,13 +42,14 @@ import nodemailer from "nodemailer";
 import { env } from "../configs/env";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: env.SMTP_USER,
     pass: env.SMTP_PASS,
   },
 });
-
 export const sendEmail = async ({
   to,
   subject,
