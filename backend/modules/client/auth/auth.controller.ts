@@ -51,6 +51,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
+  console.log("[AUTH] Login: refresh cookie set");
 
   return sendResponse(res, 200, "Login successful", { user: result.user, accessToken: result.accessToken, role:"user"});
 });

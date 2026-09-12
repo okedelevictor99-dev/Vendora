@@ -130,6 +130,11 @@ export const loginService = async (data: { email: string; password: string; devi
   const payload = { userId: user._id.toString() };
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken(payload);
+  console.log(
+      "[AUTH] Refresh token cookie exists:",
+      !!refreshToken
+    );
+  
 
   await saveRefreshToken({
     userId: new mongoose.Types.ObjectId(user._id),
