@@ -88,6 +88,10 @@ export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
 
 export const adminRefreshToken = asyncHandler(async (req: Request, res: Response) => {
   const refreshToken = req.cookies.adminRefreshToken;
+   console.log(
+    "[AUTH] Refresh token cookie exists:",
+    !!refreshToken
+  );
 
   if (!refreshToken) {
     throw new AppError(
