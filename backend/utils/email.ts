@@ -1,46 +1,5 @@
 
 
-// import nodemailer from "nodemailer";
-
-// import { env } from "../configs/env";
-
-// const transporter = nodemailer.createTransport({
-//   host: "smtp.gmail.com",
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: env.SMTP_USER,
-//     pass: env.SMTP_PASS,
-//   },
-// });
-// export const sendEmail = async ({
-//   to,
-//   subject,
-//   html,
-// }: {
-//   to: string;
-//   subject: string;
-//   html: string;
-// }) => {
-//   console.log("📧 Attempting to send email to:", to);
-
-//   try {
-//     const info = await transporter.sendMail({
-//       from: `"Vendora" <${env.SMTP_USER}>`,
-//       to,
-//       subject,
-//       html,
-//     });
-
-//     console.log("✅ Email sent:", info.messageId);
-
-//     return info;
-//   } catch (error) {
-//     console.error("❌ Email sending failed:", error);
-//     throw error;
-//   }
-// };
-
 import { BrevoClient } from "@getbrevo/brevo";
 import { env } from "../configs/env";
 

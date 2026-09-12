@@ -14,11 +14,7 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
   JWT_ACCESS_EXPIRES_IN: z.string().default('7d'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-
-  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
-  SMTP_USER: z.string().email("Invalid SMTP_USER"),
-SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
-BREVO_API_KEY: z.string().min(1, "BREVO_API_KEY is required"),
+  BREVO_API_KEY: z.string().min(1, "BREVO_API_KEY is required"),
 
   CLIENT_URL: z.string().url(),
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
