@@ -18,6 +18,7 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
   SMTP_USER: z.string().email("Invalid SMTP_USER"),
 SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
+BREVO_API_KEY: z.string().min(1, "BREVO_API_KEY is required"),
 
   CLIENT_URL: z.string().url(),
   BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
