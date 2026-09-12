@@ -46,13 +46,13 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   });
 
   res.cookie("refreshToken", result.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-  console.log("[AUTH] Login: refresh cookie set");
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 
+console.log("[AUTH] Set-Cookie:", res.getHeader("Set-Cookie"));
   return sendResponse(res, 200, "Login successful", { user: result.user, accessToken: result.accessToken, role:"user"});
 });
 
