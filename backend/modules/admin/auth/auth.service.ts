@@ -137,6 +137,10 @@ export const adminLoginService = async (data: { email: string; password: string;
   const payload = { adminId: admin._id.toString(), role: admin.role };
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken(payload);
+   console.log(
+    "[AUTH] Refresh token cookie exists:",
+    !!refreshToken
+  );
 
   await saveAdminRefreshToken({
     adminId: new mongoose.Types.ObjectId(admin._id),
