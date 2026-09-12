@@ -21,6 +21,7 @@ import adminProductRoutes from "@/modules/admin/product/product.routes"
 import adminDashboardRoutes from "@/modules/admin/dashboard/dashboard.route";
 import adminUserRoutes from "@/modules/admin/user/user.routes"
 import adminAccountRoutes from "@/modules/admin/account/account.route"
+import { requestLogger } from "@/middlewares/requestloggermiddleware";
 import { initCrons } from "./crons/cron.index";
 import webhookRoutes from "@/modules/client/webhook/webhook.route";
 
@@ -42,8 +43,9 @@ app.use((req, _res, next) => {
   logger.http(`${req.method} ${req.originalUrl}`);
   next();
 });
+app.use(requestLogger);
 
-// initCrons();
+initCrons();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
