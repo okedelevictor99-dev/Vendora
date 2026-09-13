@@ -19,29 +19,73 @@ const getCartAndItem = async (userId: string, productId: string) => {
   return { cart, item };
 };
 
-export const addToCartService = async (userId: string, productId: string, quantity: number) => {
+export const addToCartService = async (
+  userId: string,
+  productId: string,
+  quantity: number
+) => {
+
+  console.log("1. PRODUCT ID:", productId);
+
   const product = await findProductById(productId);
-  if (!product || !product.isActive) throw new AppError("Product not found", 404);
+
+  console.log("2. PRODUCT:", product);
+
+  if (!product || !product.isActive)
+    throw new AppError("Product not found", 404);
+
+  console.log("3. PRODUCT VALID");
 
   const availableStock = product.stock - product.reservedStock;
-  if (availableStock < quantity) throw new AppError("Insufficient stock", 400);
+
+  console.log("4. STOCK:", {
+    stock: product.stock,
+    reservedStock: product.reservedStock,
+    availableStock,
+  });
+
+  if (availableStock < quantity)
+    throw new AppError("Insufficient stock", 400);
 
   let cart = await findCartByUserId(userId);
-  if (!cart) cart = await createCart(userId);
 
-  const existingItem = cart.items.find((item) => item.product.toString() === productId);
+  console.log("5. CART:", cart);
+
+  if (!cart) {
+    cart = await createCart(userId);
+    console.log("6. CREATED CART:", cart);
+  }
+
+  const existingItem = cart.items.find(
+    (item) => item.product.toString() === productId
+  );
+
+  console.log("7. EXISTING ITEM:", existingItem);
 
   if (existingItem) {
     const newQuantity = existingItem.quantity + quantity;
-    if (newQuantity > product.stock) throw new AppError("Requested quantity exceeds stock", 400);
+
+    if (newQuantity > availableStock)
+      throw new AppError("Insufficient stock", 400);
+
     existingItem.quantity = newQuantity;
   } else {
-    cart.items.push({ product: product._id, quantity });
+    cart.items.push({
+      product: product._id,
+      quantity,
+    });
   }
+
+  console.log("8. CART BEFORE SAVE:", cart);
 
   await saveCart(cart);
 
+  console.log("9. CART SAVED");
+
   const updatedCart = await getPopulatedCart(userId);
+
+  console.log("10. POPULATED CART:", updatedCart);
+
   return formatCart(updatedCart);
 };
 

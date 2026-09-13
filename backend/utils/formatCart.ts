@@ -4,6 +4,15 @@ export const formatCart = (cart: any) => {
 
   const formattedItems = cart.items.map((item: any) => {
     const product = item.product;
+
+    console.log("CART ITEM PRODUCT:", product);
+
+    if (!product) {
+      throw new Error(
+        `Cart contains invalid/missing product: ${item.product}`
+      );
+    }
+
     const itemSubtotal = product.price * item.quantity;
 
     subtotal += itemSubtotal;
@@ -23,5 +32,10 @@ export const formatCart = (cart: any) => {
     };
   });
 
-  return { items: formattedItems, totalItems: formattedItems.length, totalQuantity, subtotal };
+  return {
+    items: formattedItems,
+    totalItems: formattedItems.length,
+    totalQuantity,
+    subtotal,
+  };
 };
