@@ -11,7 +11,7 @@ export const useCheckout = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
-  });
+  })
 
   return {
     checkout: mutation.mutateAsync,
