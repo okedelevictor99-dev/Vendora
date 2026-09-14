@@ -1,4 +1,4 @@
-import { client } from "@/api-setup/client";
+import { client, getRefreshToken} from "@/api-setup/client";
 import type { ApiResponse } from "@/app/response";
 import type {
   LoginPayload,
@@ -33,10 +33,7 @@ export const login = async (payload: LoginPayload) => {
   return data;
 };
 
-export const logout = async () => {
-  const { data } = await client.post<ApiResponse>("/auth/logout");
-  return data;
-};
+export const logout = async () => { const refreshToken = getRefreshToken(); const { data } = await client.post<ApiResponse>("/auth/logout", { refreshToken, }); return data; };
 
 export const logoutAll = async () => {
   const { data } = await client.post<ApiResponse>("/auth/logout-all");
@@ -57,7 +54,16 @@ export const resetPassword = async (payload: ResetPasswordPayload) => {
   const { data } = await client.post<ApiResponse>("/auth/reset-password", payload);
   return data;
 };
+
 export const restoreSession = async () => {
-  const { data } = await client.post<ApiResponse<RefreshTokenResponseData>>("/auth/refresh-token");
+  const refreshToken = getRefreshToken();
+
+  const { data } = await client.post<
+    ApiResponse<RefreshTokenResponseData>
+  >("/auth/refresh-token", {
+    refreshToken,
+  });
+
   return data;
 };
+

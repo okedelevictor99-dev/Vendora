@@ -1,6 +1,18 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { restoreSession } from "@/features/client/auth/auth.api"
-import { setAccessToken } from "@/api-setup/client";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+
+import { restoreSession } from "@/features/client/auth/auth.api";
+
+import {
+  setAccessToken,
+  setRefreshToken,
+} from "@/api-setup/client";
+
 import type { User } from "@/features/client/auth/auth.type";
 
 interface AuthContextValue {
@@ -12,7 +24,11 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const attemptRestore = async () => {
       try {
         const response = await restoreSession();
+
         setAccessToken(response.data.accessToken);
+        setRefreshToken(response.data.refreshToken);
+
         setUser({
           id: response.data.id,
           name: response.data.name,
@@ -30,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       } catch {
         setAccessToken(null);
+        setRefreshToken(null);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -40,7 +60,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, setUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -48,9 +75,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuthContext must be used within AuthProvider");
   }
+
   return context;
 };
-

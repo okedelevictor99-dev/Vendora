@@ -15,8 +15,9 @@ export interface LoginPayload {
 
 export interface LoginResponseData {
   user: User;
-  accessToken: string,
-  role:UserRole
+  accessToken: string;
+  refreshToken: string;
+  role: UserRole;
 }
 
 export interface SignupPayload {
@@ -50,8 +51,9 @@ export interface ResetPasswordPayload {
 
 export interface RefreshTokenResponseData {
   accessToken: string;
+  refreshToken: string;
   id: string;
   role: UserRole;
-  name:string
-  email:string
+  name: string;
+  email: string;
 }

@@ -35,6 +35,7 @@ export const resendVerificationToken = asyncHandler(async (req: Request, res: Re
   return sendResponse(res, 200, "A new verification code has been sent to your email.");
 });
 
+
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.validatedBody;
 
@@ -45,42 +46,52 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     ip: req.ip,
   });
 
-  res.cookie("refreshToken", result.refreshToken, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
-
-console.log("[AUTH] Set-Cookie:", res.getHeader("Set-Cookie"));
-  return sendResponse(res, 200, "Login successful", { user: result.user, accessToken: result.accessToken, role:"user"});
-});
-
-export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) throw new AppError("No refresh token provided", 401);
-
-  const tokens = await refreshTokenService(refreshToken);
-
-  res.cookie("refreshToken", tokens.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+  return sendResponse(res, 200, "Login successful", {
+    user: result.user,
+    accessToken: result.accessToken,
+    refreshToken: result.refreshToken,
+    role: "user",
   });
-
-  return sendResponse(res, 200, "Token refreshed successfully", { accessToken: tokens.accessToken, id:tokens.id, role:tokens.role, name:tokens.name, email:tokens.email});
 });
+
+
+
+export const refreshToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new AppError("No refresh token provided", 401);
+    }
+
+    const tokens = await refreshTokenService(refreshToken);
+
+    return sendResponse(res, 200, "Token refreshed successfully", {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      id: tokens.id,
+      role: tokens.role,
+      name: tokens.name,
+      email: tokens.email,
+    });
+  }
+);
+
+
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) throw new AppError("No refresh token provided", 400);
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    throw new AppError("No refresh token provided", 400);
+  }
 
   await logoutService(refreshToken);
-  res.clearCookie("refreshToken");
 
   return sendResponse(res, 200, "Logged out successfully");
 });
+
+
 
 export const logoutAll = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.user!;

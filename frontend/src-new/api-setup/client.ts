@@ -1,10 +1,13 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+
+import axios, {
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
 export const client = axios.create({
   baseURL,
-  withCredentials: true,
 });
 
 let accessToken: string | null = null;
@@ -15,12 +18,29 @@ export const setAccessToken = (token: string | null) => {
 
 export const getAccessToken = () => accessToken;
 
-client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
+const REFRESH_TOKEN_KEY = "refreshToken";
+
+export const setRefreshToken = (token: string | null) => {
+  if (token) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   }
-  return config;
-});
+};
+
+export const getRefreshToken = () => {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+};
+
+client.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  }
+);
 
 const PUBLIC_AUTH_PATHS = [
   "/auth/login",
@@ -40,16 +60,30 @@ let pendingQueue: Array<() => void> = [];
 
 client.interceptors.response.use(
   (response) => response,
+
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        })
+      | undefined;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
     const isUnauthorized = error.response?.status === 401;
-    const isRefreshCall = originalRequest.url?.includes("/auth/refresh-token");
+    const isRefreshCall = originalRequest.url?.includes(
+      "/auth/refresh-token"
+    );
     const isPublicAuth = isPublicAuthRequest(originalRequest.url);
 
-    if (!isUnauthorized || isRefreshCall || isPublicAuth || originalRequest._retry) {
+    if (
+      !isUnauthorized ||
+      isRefreshCall ||
+      isPublicAuth ||
+      originalRequest._retry
+    ) {
       return Promise.reject(error);
     }
 
@@ -64,8 +98,20 @@ client.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await client.post("/auth/refresh-token");
+      const refreshToken = getRefreshToken();
+
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+
+      const { data } = await client.post("/auth/refresh-token", {
+        refreshToken,
+      });
+
       setAccessToken(data.data.accessToken);
+
+      // Save the rotated refresh token returned by the backend
+      setRefreshToken(data.data.refreshToken);
 
       pendingQueue.forEach((retry) => retry());
       pendingQueue = [];
@@ -73,10 +119,13 @@ client.interceptors.response.use(
       return client(originalRequest);
     } catch (refreshError) {
       setAccessToken(null);
+      setRefreshToken(null);
       pendingQueue = [];
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
   }
 );
+
