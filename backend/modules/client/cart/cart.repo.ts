@@ -30,3 +30,14 @@ export const getPopulatedCart = async (userId: string) => {
     select: "name price images stock reservedStock isActive",
   });
 };
+
+export const clearCartByUserId = async (
+  userId: string,
+  session: mongoose.ClientSession
+) => {
+  return Cart.findOneAndUpdate(
+    { user: new mongoose.Types.ObjectId(userId) },
+    { $set: { items: [] } },
+    { new: true, session }
+  );
+};

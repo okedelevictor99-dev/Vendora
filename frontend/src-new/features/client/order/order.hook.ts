@@ -27,6 +27,7 @@ export const useManualVerifyOrder = () => {
     onSuccess: (_data, reference) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["order", reference] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 

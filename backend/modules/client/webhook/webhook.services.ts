@@ -7,6 +7,7 @@ import {
   releaseReservedStock,
   markOrderAsFailed,
 } from "@/modules/client/order/order.repo";
+import { clearCartByUserId } from "@/modules/client/cart/cart.repo";
 import { Order } from "@/models/order.model";
 
 export const successWorker = async (reference: string) => {
@@ -25,6 +26,7 @@ export const successWorker = async (reference: string) => {
 
       if (deducted) {
         await markOrderAsPaid(reference, session);
+        await clearCartByUserId(order.user.toString(), session);
         await session.commitTransaction();
         return;
       }
@@ -36,6 +38,7 @@ export const successWorker = async (reference: string) => {
 
         if (fulfilled) {
           await markOrderAsPaid(reference, session);
+          await clearCartByUserId(order.user.toString(), session);
           await session.commitTransaction();
           return;
         }
@@ -50,6 +53,7 @@ export const successWorker = async (reference: string) => {
 
     if (fulfilled) {
       await markOrderAsPaid(reference, session);
+      await clearCartByUserId(order.user.toString(), session);
       await session.commitTransaction();
       return;
     }
