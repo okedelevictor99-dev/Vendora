@@ -1,6 +1,18 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+
 import { restoreAdminSession } from "@/features/admin/auth/auth.api";
-import { setAdminAccessToken } from "@/api-setup/adminClient";
+
+import {
+  setAdminAccessToken,
+  setAdminRefreshToken,
+} from "@/api-setup/adminClient";
+
 import type { Admin } from "@/features/admin/auth/auth.type";
 
 interface AdminAuthContextValue {
@@ -10,9 +22,15 @@ interface AdminAuthContextValue {
   setAdmin: (admin: Admin | null) => void;
 }
 
-const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(undefined);
+const AdminAuthContext = createContext<AdminAuthContextValue | undefined>(
+  undefined
+);
 
-export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
+export const AdminAuthProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,7 +38,10 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     const restore = async () => {
       try {
         const response = await restoreAdminSession();
+
         setAdminAccessToken(response.data.accessToken);
+        setAdminRefreshToken(response.data.refreshToken);
+
         setAdmin({
           id: response.data.id,
           name: response.data.name,
@@ -29,6 +50,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
         });
       } catch {
         setAdminAccessToken(null);
+        setAdminRefreshToken(null);
         setAdmin(null);
       } finally {
         setIsLoading(false);
@@ -39,7 +61,14 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AdminAuthContext.Provider value={{ admin, isAuthenticated: !!admin, isLoading, setAdmin }}>
+    <AdminAuthContext.Provider
+      value={{
+        admin,
+        isAuthenticated: !!admin,
+        isLoading,
+        setAdmin,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );
@@ -47,8 +76,12 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAdminAuthContext = () => {
   const context = useContext(AdminAuthContext);
+
   if (!context) {
-    throw new Error("useAdminAuthContext must be used within AdminAuthProvider");
+    throw new Error(
+      "useAdminAuthContext must be used within AdminAuthProvider"
+    );
   }
+
   return context;
 };

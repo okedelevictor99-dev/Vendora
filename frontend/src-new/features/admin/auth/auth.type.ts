@@ -14,10 +14,10 @@ export interface AdminLoginPayload {
 
 export interface AdminLoginResponseData {
   admin: Admin;
-  accessToken: string,
-  role:AdminRole
+  accessToken: string;
+  refreshToken: string;
+  role: AdminRole;
 }
-
 export interface SendAdminVerificationPayload {
   name: string;
   email: string;
@@ -49,8 +49,9 @@ export interface AdminResetPasswordPayload {
 
 export interface AdminRefreshTokenResponseData {
   accessToken: string;
+  refreshToken: string;
   id: string;
   role: AdminRole;
-  name:string
-  email:string
+  name: string;
+  email: string;
 }

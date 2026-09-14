@@ -1,10 +1,12 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios, {
+  type AxiosError,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
 export const adminClient = axios.create({
   baseURL,
-  withCredentials: true,
 });
 
 let adminAccessToken: string | null = null;
@@ -15,36 +17,74 @@ export const setAdminAccessToken = (token: string | null) => {
 
 export const getAdminAccessToken = () => adminAccessToken;
 
-adminClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (adminAccessToken) {
-    config.headers.Authorization = `Bearer ${adminAccessToken}`;
+const ADMIN_REFRESH_TOKEN_KEY = "adminRefreshToken";
+
+export const setAdminRefreshToken = (token: string | null) => {
+  if (token) {
+    localStorage.setItem(ADMIN_REFRESH_TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(ADMIN_REFRESH_TOKEN_KEY);
   }
-  return config;
-});
+};
+
+export const getAdminRefreshToken = () => {
+  return localStorage.getItem(ADMIN_REFRESH_TOKEN_KEY);
+};
+
+adminClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (adminAccessToken) {
+      config.headers.Authorization = `Bearer ${adminAccessToken}`;
+    }
+
+    return config;
+  }
+);
 
 const PUBLIC_ADMIN_AUTH_PATHS = [
   "/admin/login",
   "/admin/signup",
   "/admin/reset-password",
 ];
+
 const isPublicAdminAuthRequest = (url?: string) =>
-  !!url && PUBLIC_ADMIN_AUTH_PATHS.some((path) => url.includes(path));
+  !!url &&
+  PUBLIC_ADMIN_AUTH_PATHS.some((path) => url.includes(path));
 
 let isRefreshing = false;
+
 let pendingQueue: Array<() => void> = [];
 
 adminClient.interceptors.response.use(
   (response) => response,
+
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        })
+      | undefined;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
     const isUnauthorized = error.response?.status === 401;
-    const isRefreshCall = originalRequest.url?.includes("/admin/refresh-token");
-    const isPublicAuth = isPublicAdminAuthRequest(originalRequest.url);
 
-    if (!isUnauthorized || isRefreshCall || isPublicAuth || originalRequest._retry) {
+    const isRefreshCall = originalRequest.url?.includes(
+      "/admin/refresh-token"
+    );
+
+    const isPublicAuth = isPublicAdminAuthRequest(
+      originalRequest.url
+    );
+
+    if (
+      !isUnauthorized ||
+      isRefreshCall ||
+      isPublicAuth ||
+      originalRequest._retry
+    ) {
       return Promise.reject(error);
     }
 
@@ -52,15 +92,30 @@ adminClient.interceptors.response.use(
 
     if (isRefreshing) {
       return new Promise((resolve) => {
-        pendingQueue.push(() => resolve(adminClient(originalRequest)));
+        pendingQueue.push(() =>
+          resolve(adminClient(originalRequest))
+        );
       });
     }
 
     isRefreshing = true;
 
     try {
-      const { data } = await adminClient.post("/admin/refresh-token");
+      const refreshToken = getAdminRefreshToken();
+
+      if (!refreshToken) {
+        throw new Error("No admin refresh token available");
+      }
+
+      const { data } = await adminClient.post(
+        "/admin/refresh-token",
+        {
+          refreshToken,
+        }
+      );
+
       setAdminAccessToken(data.data.accessToken);
+      setAdminRefreshToken(data.data.refreshToken);
 
       pendingQueue.forEach((retry) => retry());
       pendingQueue = [];
@@ -68,7 +123,9 @@ adminClient.interceptors.response.use(
       return adminClient(originalRequest);
     } catch (refreshError) {
       setAdminAccessToken(null);
+      setAdminRefreshToken(null);
       pendingQueue = [];
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

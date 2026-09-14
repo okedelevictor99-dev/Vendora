@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import * as adminAuthApi from "@/features/admin/auth/auth.api";
-import { setAdminAccessToken } from "@/api-setup/adminClient";
+import { setAdminAccessToken,setAdminRefreshToken } from "@/api-setup/adminClient";
 import { useAdminAuthContext } from "@/context/adminAuthContext";
 import type {
   AdminLoginPayload,
@@ -17,10 +17,11 @@ export const useAdminAuth = () => {
 
   const adminLoginMutation = useMutation({
     mutationFn: (payload: AdminLoginPayload) => adminAuthApi.adminLogin(payload),
-    onSuccess: (response) => {
-      setAdminAccessToken(response.data.accessToken);
-      setAdmin(response.data.admin);
-    },
+   onSuccess: (response) => {
+  setAdminAccessToken(response.data.accessToken);
+  setAdminRefreshToken(response.data.refreshToken);
+  setAdmin(response.data.admin);
+},
   });
 
   const adminSignupMutation = useMutation({
@@ -39,10 +40,11 @@ export const useAdminAuth = () => {
 
   const adminLogoutMutation = useMutation({
     mutationFn: () => adminAuthApi.adminLogout(),
-    onSuccess: () => {
-      setAdminAccessToken(null);
-      setAdmin(null);
-    },
+   onSuccess: () => {
+  setAdminAccessToken(null);
+  setAdminRefreshToken(null);
+  setAdmin(null);
+},
   });
 
   const adminForgotPasswordMutation = useMutation({

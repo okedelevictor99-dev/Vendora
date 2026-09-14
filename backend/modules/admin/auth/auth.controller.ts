@@ -57,92 +57,63 @@ export const adminSignup = asyncHandler(async (req: Request, res: Response) => {
   );
 });
 
-export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.validatedBody;
+export const adminLogin = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email, password } = req.validatedBody;
 
-  const result = await adminLoginService({
-    email,
-    password,
-    deviceInfo: req.get("user-agent"),
-    ip: req.ip,
-  });
+    const result = await adminLoginService({
+      email,
+      password,
+      deviceInfo: req.get("user-agent"),
+      ip: req.ip,
+    });
 
-  res.cookie("adminRefreshToken", result.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  return sendResponse(
-    res,
-    200,
-    "Login successful",
-    {
+    return sendResponse(res, 200, "Login successful", {
       admin: result.admin,
       accessToken: result.accessToken,
-      role:result.admin.role
-    }
-  );
-});
-
-export const adminRefreshToken = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.adminRefreshToken;
-   console.log(
-    "[AUTH] Refresh token cookie exists:",
-    !!refreshToken
-  );
-
-  if (!refreshToken) {
-    throw new AppError(
-      "No refresh token provided",
-      401
-    );
+      refreshToken: result.refreshToken,
+      role: result.admin.role,
+    });
   }
+);
 
-  const tokens = await adminRefreshTokenService(refreshToken);
+export const adminRefreshToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
 
-  res.cookie("adminRefreshToken", tokens.refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+    if (!refreshToken) {
+      throw new AppError("No refresh token provided", 401);
+    }
 
-  return sendResponse(
-    res,
-    200,
-    "Token refreshed",
-    {
+    const tokens = await adminRefreshTokenService(refreshToken);
+
+    return sendResponse(res, 200, "Token refreshed", {
       accessToken: tokens.accessToken,
-      id:tokens.id,
-      role:tokens.role,
-      name:tokens.name,
-      email:tokens.email
+      refreshToken: tokens.refreshToken,
+      id: tokens.id,
+      role: tokens.role,
+      name: tokens.name,
+      email: tokens.email,
+    });
+  }
+);
+export const adminLogout = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new AppError("No refresh token", 400);
     }
-  );
-});
 
-export const adminLogout = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.adminRefreshToken;
+    await adminLogoutService(refreshToken);
 
-  if (!refreshToken) {
-    throw new AppError(
-      "No refresh token",
-      400
+    return sendResponse(
+      res,
+      200,
+      "Logged out successfully"
     );
   }
-
-  await adminLogoutService(refreshToken);
-
-  res.clearCookie("adminRefreshToken");
-
-  return sendResponse(
-    res,
-    200,
-    "Logged out successfully"
-  );
-});
+);
 
 export const adminForgotPassword = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.validatedBody;

@@ -1,4 +1,4 @@
-import { adminClient } from "@/api-setup/adminClient";
+import { adminClient,getAdminRefreshToken } from "@/api-setup/adminClient";
 import type { ApiResponse } from "@/app/response";
 import type {
   AdminLoginPayload,
@@ -38,17 +38,27 @@ export const adminSignup = async (payload: AdminSignupPayload) => {
 };
 
 export const adminLogin = async (payload: AdminLoginPayload) => {
-  const { data } = await adminClient.post<ApiResponse<AdminLoginResponseData>>(
-    "/admin/login",
-    payload
-  );
+  const { data } = await adminClient.post<
+    ApiResponse<AdminLoginResponseData>
+  >("/admin/login", payload);
+
   return data;
 };
 
+
 export const adminLogout = async () => {
-  const { data } = await adminClient.post<ApiResponse>("/admin/logout");
+  const refreshToken = getAdminRefreshToken();
+
+  const { data } = await adminClient.post<ApiResponse>(
+    "/admin/logout",
+    {
+      refreshToken,
+    }
+  );
+
   return data;
 };
+
 
 export const adminForgotPassword = async (payload: AdminForgotPasswordPayload) => {
   const { data } = await adminClient.post<ApiResponse>(
@@ -75,8 +85,13 @@ export const adminResetPassword = async (payload: AdminResetPasswordPayload) => 
 };
 
 export const restoreAdminSession = async () => {
-  const { data } = await adminClient.post<ApiResponse<AdminRefreshTokenResponseData>>(
-    "/admin/refresh-token"
-  );
+  const refreshToken = getAdminRefreshToken();
+
+  const { data } = await adminClient.post<
+    ApiResponse<AdminRefreshTokenResponseData>
+  >("/admin/refresh-token", {
+    refreshToken,
+  });
+
   return data;
 };
