@@ -43,4 +43,4 @@ export const stockExpiryCron = () => {
       logger.error(`Stock expiry cron failed: ${err}`);
     }
   });
-};
+}
