@@ -3,7 +3,7 @@ import { findExpiredInitiatedOrders,releaseReservedStock } from "@/modules/clien
 import { logger } from "../configs/logger.config";
 
 export const stockExpiryCron = () => {
-  cron.schedule("*/1 * * * *", async () => {
+  cron.schedule("*/5 * * * *", async () => {
     logger.info("Exipre order cron running")
 
     try {

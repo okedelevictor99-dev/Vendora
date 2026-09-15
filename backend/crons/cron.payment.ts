@@ -6,7 +6,7 @@ import { successWorker,failureWorker } from "@/modules/client/webhook/webhook.se
 import { logger } from "../configs/logger.config";
 
 export const paymentVerificationCron = () => {
-  cron.schedule("*/5 * * * *", async () => {
+  cron.schedule("*/1 * * * *", async () => {
     logger.info("Payment verification cron running...");
 
     try {
