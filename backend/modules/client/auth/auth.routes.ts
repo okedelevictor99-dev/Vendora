@@ -27,20 +27,21 @@ import{
 
 
 import { user } from "@/middlewares/user.middleware";
+import { authRateLimiter } from "@/middlewares/rateLimit.middleware";
 
 const router = Router();
 
 
-router.post("/signup", validate({ body: signupSchema }), signup);
+router.post("/signup", authRateLimiter, validate({ body: signupSchema }), signup);
 
 router.post(
-  "/verify-email",
+  "/verify-email", authRateLimiter,
   validate({ body: verifyEmailSchema }),
   verifyEmail
 );
 
 router.post(
-  "/resend-verification-token",
+  "/resend-verification-token", authRateLimiter,
   validate({ body: resendVerificationTokenSchema }),
   resendVerificationToken
 );
@@ -57,19 +58,19 @@ router.post("/logout",logout);
 router.post("/logout-all", user, logoutAll);
 
 router.post(
-  "/forgot-password",
+  "/forgot-password", authRateLimiter,
   validate({ body: forgotPasswordSchema }),
   forgotPassword
 );
 
 router.post(
-  "/resend-forgot-password-token",
+  "/resend-forgot-password-token", authRateLimiter,
   validate({ body: resendForgotPasswordTokenSchema }),
   resendForgotPasswordToken
 );
 
 router.post(
-  "/reset-password",
+  "/reset-password", authRateLimiter,
   validate({ body: resetPasswordSchema }),
   resetPassword
 );

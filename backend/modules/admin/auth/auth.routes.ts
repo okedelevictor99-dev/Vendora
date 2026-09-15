@@ -28,13 +28,14 @@ import {
   resendForgotPasswordTokenSchema,
   resetPasswordSchema,
 } from "@/modules/admin/auth/auth.validation";
+import { authRateLimiter } from "@/middlewares/rateLimit.middleware";
 
 const router = Router();
 
 router.post(
   "/send-verification-token",
   admin,
-  superAdmin,
+  superAdmin, authRateLimiter,
   validate({
     body: sendAdminVerificationSchema,
   }),
@@ -44,7 +45,7 @@ router.post(
 router.post(
   "/resend-verification-token",
   admin,
-  superAdmin,
+  superAdmin,authRateLimiter,
   validate({
     body: resendAdminVerificationSchema,
   }),
@@ -55,7 +56,7 @@ router.post(
 router.post(
   "/resend-forgot-password-token",
   admin,
-  superAdmin,
+  superAdmin, authRateLimiter,
   validate({
     body:
       resendForgotPasswordTokenSchema,
@@ -65,7 +66,7 @@ router.post(
 
 
 router.post(
-  "/signup",
+  "/signup", authRateLimiter,
   validate({
     body: adminSignupSchema,
   }),
@@ -74,7 +75,7 @@ router.post(
 
 
 router.post(
-  "/login",
+  "/login", authRateLimiter,
   validate({
     body: adminLoginSchema,
   }),
@@ -95,7 +96,7 @@ router.post(
 router.post(
   "/forgot-password",
   admin,
-  superAdmin,
+  superAdmin, authRateLimiter,
   validate({
     body: forgotPasswordSchema,
   }),
@@ -104,7 +105,7 @@ router.post(
 
 
 router.post(
-  "/reset-password",
+  "/reset-password", authRateLimiter,
   validate({
     body: resetPasswordSchema,
   }),

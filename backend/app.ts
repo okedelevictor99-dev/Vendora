@@ -37,7 +37,7 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(compression());
 app.use(hpp());
 app.use(cookieParser());
-// app.use(globalRateLimiter);
+app.use(globalRateLimiter);
 
 app.use((req, _res, next) => {
   logger.http(`${req.method} ${req.originalUrl}`);
