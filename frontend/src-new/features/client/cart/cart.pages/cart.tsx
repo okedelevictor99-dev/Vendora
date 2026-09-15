@@ -52,9 +52,13 @@ const { checkout, isCheckingOut } = useCheckout();
   try {
     const { paymentUrl } = await checkout();
     window.location.href = paymentUrl;
-  } catch {
-    showToast("Failed to start checkout");
-  }
+  }catch (error: unknown) {
+  showToast(
+    error instanceof Error
+      ? error.message
+      : "Failed to start checkout"
+  );
+}
 };
 
   const handleIncrease = async (id: string) => {
