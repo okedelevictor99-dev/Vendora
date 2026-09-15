@@ -1,42 +1,45 @@
 
 import cron from "node-cron";
-import {  incrementVerifyAttempts } from "@/modules/client/order/order.repo";
+import { findOrdersForVerification, incrementVerifyAttempts } from "@/modules/client/order/order.repo";
 import { verifyPaystackPayment } from "@/utils/paystack";
 import { successWorker,failureWorker } from "@/modules/client/webhook/webhook.services";
-import { Order } from "@/models/order.model";
 import { logger } from "../configs/logger.config";
 
-export const findOrdersForVerification = async () => {
-  const now = new Date();
+export const paymentVerificationCron = () => {
+  cron.schedule("*/1 * * * *", async () => {
+    logger.info("Payment verification cron running...");
 
-  const twentyMinutesAgo = new Date(
-    now.getTime() - 20 * 60 * 1000
-  );
+    try {
+      const orders = await findOrdersForVerification();
 
-  const fiveMinutesAgo = new Date(
-    now.getTime() - 5 * 60 * 1000
-  );
+      if (orders.length === 0){
+        logger.info("No order pending verification, cron stopped running")
+        return
+      } 
 
-  logger.info({
-    now: now.toISOString(),
-    twentyMinutesAgo: twentyMinutesAgo.toISOString(),
-    fiveMinutesAgo: fiveMinutesAgo.toISOString(),
+      for (const order of orders) {
+        try {
+          await incrementVerifyAttempts(order.reference);
+
+          const result = await verifyPaystackPayment(order.reference);
+
+          if (result === "success") {
+            await successWorker(order.reference);
+            logger.info(`Payment verified for order ${order.reference}`);
+          } else if (result === "failed") {
+            await failureWorker(order.reference);
+            logger.info(`Payment failed for order ${order.reference}`);
+          } else {
+            logger.info(`Payment inconclusive for order ${order.reference}, will retry`);
+          }
+
+        } catch (err) {
+          logger.error(`Verification failed for order ${order.reference}: ${err}`);
+        }
+      }
+
+    } catch (err) {
+      logger.error(`Payment verification cron failed: ${err}`);
+    }
   });
-
-  const orders = await Order.find({
-    status: "initiated",
-    verifyAttempts: { $lt: 5 },
-    createdAt: { $lte: twentyMinutesAgo },
-    $or: [
-      { lastVerifiedAt: null },
-      { lastVerifiedAt: { $lte: fiveMinutesAgo } },
-    ],
-  });
-
-  logger.info({
-    ordersFound: orders.length,
-    references: orders.map((order) => order.reference),
-  });
-
-  return orders;
 };

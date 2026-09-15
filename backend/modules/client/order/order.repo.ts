@@ -4,6 +4,7 @@ import { Order, IOrder } from "@/models/order.model";
 import { Product } from "@/models/product.model";
 import { AppError } from "@/utils/appError";
 import { PaginationOptions, getSkip } from "@/utils/pagination";
+import { logger } from "@/configs/logger.config";
 
 export const createOrder = async (
   data: Partial<IOrder>,
@@ -215,15 +216,38 @@ export const findExpiredInitiatedOrders = async () => {
 
 
 export const findOrdersForVerification = async () => {
-  return Order.find({
+  const now = new Date();
+
+  const twentyMinutesAgo = new Date(
+    now.getTime() - 20 * 60 * 1000
+  );
+
+  const fiveMinutesAgo = new Date(
+    now.getTime() - 5 * 60 * 1000
+  );
+
+  logger.info({
+    now: now.toISOString(),
+    twentyMinutesAgo: twentyMinutesAgo.toISOString(),
+    fiveMinutesAgo: fiveMinutesAgo.toISOString(),
+  });
+
+  const orders = await Order.find({
     status: "initiated",
     verifyAttempts: { $lt: 5 },
-    createdAt: { $lte: new Date(Date.now() - 20 * 60 * 1000) },
+    createdAt: { $lte: twentyMinutesAgo },
     $or: [
       { lastVerifiedAt: null },
-      { lastVerifiedAt: { $lte: new Date(Date.now() - 5 * 60 * 1000) } },
+      { lastVerifiedAt: { $lte: fiveMinutesAgo } },
     ],
   });
+
+  logger.info({
+    ordersFound: orders.length,
+    references: orders.map((order) => order.reference),
+  });
+
+  return orders;
 };
 
 export const incrementVerifyAttempts = async (
