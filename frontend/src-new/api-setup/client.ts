@@ -55,7 +55,25 @@ const PUBLIC_AUTH_PATHS = [
 const isPublicAuthRequest = (url?: string) =>
   !!url && PUBLIC_AUTH_PATHS.some((path) => url.includes(path));
 
+/*
+ * Extract the backend error message.
+ *
+ * Example backend response:
+ * {
+ *   success: false,
+ *   message: "Insufficient stock for Nike Air Max"
+ * }
+ */
+const getErrorMessage = (error: AxiosError) => {
+  return (
+    (error.response?.data as { message?: string })?.message ||
+    error.message ||
+    "Something went wrong"
+  );
+};
+
 let isRefreshing = false;
+
 let pendingQueue: Array<() => void> = [];
 
 client.interceptors.response.use(
@@ -69,22 +87,31 @@ client.interceptors.response.use(
       | undefined;
 
     if (!originalRequest) {
-      return Promise.reject(error);
+      return Promise.reject(new Error(getErrorMessage(error)));
     }
 
     const isUnauthorized = error.response?.status === 401;
+
     const isRefreshCall = originalRequest.url?.includes(
       "/auth/refresh-token"
     );
+
     const isPublicAuth = isPublicAuthRequest(originalRequest.url);
 
+    /*
+     * For normal errors (400, 404, 409, 500, etc.),
+     * return the backend's actual error message.
+     *
+     * Example:
+     * "Insufficient stock for Nike Air Max"
+     */
     if (
       !isUnauthorized ||
       isRefreshCall ||
       isPublicAuth ||
       originalRequest._retry
     ) {
-      return Promise.reject(error);
+      return Promise.reject(new Error(getErrorMessage(error)));
     }
 
     originalRequest._retry = true;
@@ -114,6 +141,7 @@ client.interceptors.response.use(
       setRefreshToken(data.data.refreshToken);
 
       pendingQueue.forEach((retry) => retry());
+
       pendingQueue = [];
 
       return client(originalRequest);

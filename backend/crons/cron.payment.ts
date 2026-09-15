@@ -13,7 +13,7 @@ export const paymentVerificationCron = () => {
       const orders = await findOrdersForVerification();
 
       if (orders.length === 0){
-        logger.info("No order pending verification, cron stopped running")
+        logger.info("No orders currently eligible for payment verification");
         return
       } 
 
