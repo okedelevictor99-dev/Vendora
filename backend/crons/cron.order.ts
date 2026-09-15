@@ -4,7 +4,7 @@ import { logger } from "../configs/logger.config";
 
 export const stockExpiryCron = () => {
   cron.schedule("*/1 * * * *", async () => {
-    console.log("Exipre order cron running")
+    logger.info("Exipre order cron running")
 
     try {
       const expiredOrders = await findExpiredInitiatedOrders();

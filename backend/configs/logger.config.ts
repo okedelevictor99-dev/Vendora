@@ -1,5 +1,5 @@
-import winston from 'winston';
-import { env } from './env';
+import winston from "winston";
+import { env } from "./env";
 
 const logFormat = winston.format.combine(
   winston.format.timestamp(),
@@ -8,27 +8,24 @@ const logFormat = winston.format.combine(
 );
 
 export const logger = winston.createLogger({
-  level: env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: env.NODE_ENV === "production" ? "info" : "debug",
+
   format: logFormat,
-  defaultMeta: { service: 'auth-api' },
+
+  defaultMeta: {
+    service: "auth-api",
+  },
+
   transports: [
+    new winston.transports.Console(),
+
     new winston.transports.File({
-      filename: 'src/logs/error.log',
-      level: 'error',
+      filename: "src/logs/error.log",
+      level: "error",
     }),
+
     new winston.transports.File({
-      filename: 'src/logs/combined.log',
+      filename: "src/logs/combined.log",
     }),
   ],
 });
-
-if (env.NODE_ENV !== 'production') {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
-    })
-  );
-}
