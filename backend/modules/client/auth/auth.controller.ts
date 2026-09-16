@@ -58,7 +58,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.body || {}
 
     if (!refreshToken) {
       throw new AppError("No refresh token provided", 401);

@@ -55,14 +55,8 @@ const PUBLIC_AUTH_PATHS = [
 const isPublicAuthRequest = (url?: string) =>
   !!url && PUBLIC_AUTH_PATHS.some((path) => url.includes(path));
 
-/*
+/**
  * Extract the backend error message.
- *
- * Example backend response:
- * {
- *   success: false,
- *   message: "Insufficient stock for Nike Air Max"
- * }
  */
 const getErrorMessage = (error: AxiosError) => {
   return (
@@ -87,7 +81,7 @@ client.interceptors.response.use(
       | undefined;
 
     if (!originalRequest) {
-      return Promise.reject(new Error(getErrorMessage(error)));
+      return Promise.reject(error);
     }
 
     const isUnauthorized = error.response?.status === 401;
@@ -98,12 +92,12 @@ client.interceptors.response.use(
 
     const isPublicAuth = isPublicAuthRequest(originalRequest.url);
 
-    /*
+    /**
      * For normal errors (400, 404, 409, 500, etc.),
-     * return the backend's actual error message.
+     * preserve the original Axios error so callers can
+     * inspect error.response?.status.
      *
-     * Example:
-     * "Insufficient stock for Nike Air Max"
+     * Also don't intercept refresh-token requests themselves.
      */
     if (
       !isUnauthorized ||
@@ -111,7 +105,7 @@ client.interceptors.response.use(
       isPublicAuth ||
       originalRequest._retry
     ) {
-      return Promise.reject(new Error(getErrorMessage(error)));
+      return Promise.reject(error);
     }
 
     originalRequest._retry = true;
@@ -137,17 +131,31 @@ client.interceptors.response.use(
 
       setAccessToken(data.data.accessToken);
 
-      // Save the rotated refresh token returned by the backend
-      setRefreshToken(data.data.refreshToken);
+      // Save the rotated refresh token returned by the backend.
+      if (data.data.refreshToken) {
+        setRefreshToken(data.data.refreshToken);
+      }
 
       pendingQueue.forEach((retry) => retry());
-
       pendingQueue = [];
 
       return client(originalRequest);
     } catch (refreshError) {
       setAccessToken(null);
-      setRefreshToken(null);
+
+      const status = (refreshError as AxiosError).response?.status;
+
+      /**
+       * Only delete the stored refresh token when the backend
+       * explicitly tells us that the refresh token is invalid.
+       *
+       * 500 / network error / timeout:
+       * keep the refresh token so we can try again later.
+       */
+      if (status === 401) {
+        setRefreshToken(null);
+      }
+
       pendingQueue = [];
 
       return Promise.reject(refreshError);

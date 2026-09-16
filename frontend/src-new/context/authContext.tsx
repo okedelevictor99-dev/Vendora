@@ -7,12 +7,10 @@ import {
 } from "react";
 
 import { restoreSession } from "@/features/client/auth/auth.api";
-
 import {
   setAccessToken,
   setRefreshToken,
 } from "@/api-setup/client";
-
 import type { User } from "@/features/client/auth/auth.type";
 
 interface AuthContextValue {
@@ -47,10 +45,19 @@ export const AuthProvider = ({
           role: response.data.role,
           isEmailVerified: true,
         });
-      } catch {
-        setAccessToken(null);
-        setRefreshToken(null);
-        setUser(null);
+      } catch (error: any) {
+        const status = error?.response?.status;
+
+        // Only clear the session when the refresh token
+        // is actually rejected/invalid.
+        if (status === 401) {
+          setAccessToken(null);
+          setRefreshToken(null);
+          setUser(null);
+        }
+
+        // For 500, network errors, etc.:
+        // keep the refresh token so the next attempt can try again.
       } finally {
         setIsLoading(false);
       }
