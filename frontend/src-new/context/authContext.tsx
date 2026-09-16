@@ -19,7 +19,7 @@ interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: (user: User | null) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
