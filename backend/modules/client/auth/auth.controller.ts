@@ -86,7 +86,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError("No refresh token provided", 400);
   }
 
-  await logoutService(refreshToken);
+  await logoutService(refreshToken)
 
   return sendResponse(res, 200, "Logged out successfully");
 });
