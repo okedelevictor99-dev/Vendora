@@ -682,7 +682,6 @@ const AccountSettingsPage = () => {
 
               <Button
                 type="button"
-                variant="secondary"
                 onClick={handleLogoutAll}
                 isLoading={isLoggingOutAll}
                 className="bg-[#E8682F] text-white hover:bg-[#D95D28]"
