@@ -11,6 +11,7 @@ import { Modal } from "@/components/ui/modal";
 import { OtpInput } from "@/components/ui/otpInput";
 
 import { useToast } from "@/context/toastContext";
+import FullScreenLoader from "@/components/ui/fullScreenLoader";
 
 import {
   useUserProfile,
@@ -352,6 +353,9 @@ const AccountSettingsPage = () => {
       </div>
     );
   }
+  if (isLoggingOutAll) {
+  return <FullScreenLoader text="Logging out..." />;
+}
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -683,7 +687,6 @@ const AccountSettingsPage = () => {
               <Button
                 type="button"
                 onClick={handleLogoutAll}
-                isLoading={isLoggingOutAll}
                 className="bg-[#E8682F] text-white hover:bg-[#D95D28]"
               >
                 Log out all devices
