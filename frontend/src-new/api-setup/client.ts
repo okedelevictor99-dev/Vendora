@@ -58,13 +58,13 @@ const isPublicAuthRequest = (url?: string) =>
 /**
  * Extract the backend error message.
  */
-const getErrorMessage = (error: AxiosError) => {
-  return (
-    (error.response?.data as { message?: string })?.message ||
-    error.message ||
-    "Something went wrong"
-  );
-};
+// const getErrorMessage = (error: AxiosError) => {
+//   return (
+//     (error.response?.data as { message?: string })?.message ||
+//     error.message ||
+//     "Something went wrong"
+//   );
+// };
 
 let isRefreshing = false;
 
