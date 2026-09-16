@@ -54,7 +54,7 @@ export const AuthProvider = ({
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     attemptRestore();
   }, []);
