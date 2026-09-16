@@ -1,14 +1,21 @@
 
-
 import { useState, useEffect } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
+
 import { useAuth } from "@/features/client/auth/auth.hook";
 import { useCart } from "@/features/client/cart/cart.hook";
+
 import FullScreenLoader from "../ui/fullScreenLoader";
 
 const CustomerLayout = () => {
-  const { logout,isLoggingOut} = useAuth();
+  const {
+    logout,
+    isLoggingOut,
+    logoutAll,
+    isLoggingOutAll,
+  } = useAuth();
+
   const { cart } = useCart();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,21 +32,30 @@ const CustomerLayout = () => {
     };
   }, [menuOpen]);
 
+  const handleLogoutAll = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to log out of all devices? This will sign you out everywhere, including this device."
+    );
 
-  if (isLoggingOut) {
+    if (!confirmed) return;
+
+    try {
+      await logoutAll();
+    } catch (error) {
+      console.error("Failed to log out of all devices:", error);
+    }
+  };
+
+  if (isLoggingOut || isLoggingOutAll) {
     return <FullScreenLoader text="Logging out..." />;
   }
-  
 
   return (
     <div className="flex min-h-screen flex-col bg-[#FAF8F4]">
       <header className="sticky top-0 z-40 border-b border-[#E5E2DA] bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-
           {/* Left */}
-
           <div className="flex items-center gap-3">
-
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
@@ -67,15 +83,11 @@ const CustomerLayout = () => {
             >
               Vend<span className="text-[#E8682F]">o</span>ra
             </Link>
-
           </div>
 
           {/* Desktop Navigation */}
-
           <div className="flex items-center gap-5">
-
             <nav className="hidden items-center gap-7 md:flex">
-
               <NavLink
                 to="/dashboard"
                 end
@@ -116,9 +128,11 @@ const CustomerLayout = () => {
                 Profile
               </NavLink>
 
+              {/* Logout all devices */}
               <button
                 type="button"
-                onClick={() => logout()}
+                onClick={handleLogoutAll}
+                disabled={isLoggingOutAll}
                 className="
                   text-sm
                   font-medium
@@ -126,16 +140,39 @@ const CustomerLayout = () => {
                   transition-colors
                   duration-200
                   hover:text-[#E8682F]
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
                 "
               >
-                Logout
+                {isLoggingOutAll
+                  ? "Logging out..."
+                  : "Logout all devices"}
               </button>
 
+              {/* Normal logout */}
+              <button
+                type="button"
+                onClick={() => logout()}
+                disabled={isLoggingOut}
+                className="
+                  text-sm
+                  font-medium
+                  text-[#8B8B85]
+                  transition-colors
+                  duration-200
+                  hover:text-[#E8682F]
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </button>
             </nav>
 
+            {/* Cart */}
             <Link
               to="/dashboard/cart"
-              className="relative transition-colors duration-200 text-[#14151A] hover:text-[#E8682F]"
+              className="relative text-[#14151A] transition-colors duration-200 hover:text-[#E8682F]"
             >
               <svg
                 className="h-6 w-6"
@@ -157,15 +194,15 @@ const CustomerLayout = () => {
                 </span>
               )}
             </Link>
-
           </div>
-
         </div>
       </header>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {menuOpen && (
           <>
+            {/* Overlay */}
             <motion.div
               className="fixed inset-0 z-40 bg-black/40 md:hidden"
               initial={{ opacity: 0 }}
@@ -174,6 +211,7 @@ const CustomerLayout = () => {
               onClick={closeMenu}
             />
 
+            {/* Drawer */}
             <motion.aside
               className="fixed left-0 top-0 z-50 flex h-full w-72 flex-col bg-white shadow-xl md:hidden"
               initial={{ x: "-100%" }}
@@ -185,6 +223,7 @@ const CustomerLayout = () => {
                 damping: 30,
               }}
             >
+              {/* Mobile Header */}
               <div className="border-b border-[#E5E2DA] px-6 py-6">
                 <Link
                   to="/dashboard"
@@ -195,6 +234,7 @@ const CustomerLayout = () => {
                 </Link>
               </div>
 
+              {/* Mobile Navigation */}
               <nav className="flex flex-1 flex-col p-4">
                 <NavLink
                   to="/dashboard"
@@ -218,7 +258,7 @@ const CustomerLayout = () => {
                     `mt-2 rounded-lg px-4 py-3 text-sm font-medium transition-all duration-200 ${
                       isActive
                         ? "bg-[#FFF2EC] font-bold text-[#E8682F]"
-                        : "text-[#14151A] hover:bg-[#FFF2EC]  hover:text-[#E8682F]"
+                        : "text-[#14151A] hover:bg-[#FFF2EC] hover:text-[#E8682F]"
                     }`
                   }
                 >
@@ -239,12 +279,11 @@ const CustomerLayout = () => {
                   Profile
                 </NavLink>
 
+                {/* Logout all devices */}
                 <button
                   type="button"
-                  onClick={() => {
-                    closeMenu();
-                    logout();
-                  }}
+                  onClick={handleLogoutAll}
+                  disabled={isLoggingOutAll}
                   className="
                     mt-2
                     rounded-lg
@@ -258,9 +297,41 @@ const CustomerLayout = () => {
                     duration-200
                     hover:bg-[#FFF2EC]
                     hover:text-[#E8682F]
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
                   "
                 >
-                  Logout
+                  {isLoggingOutAll
+                    ? "Logging out..."
+                    : "Logout all devices"}
+                </button>
+
+                {/* Normal logout */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMenu();
+                    logout();
+                  }}
+                  disabled={isLoggingOut}
+                  className="
+                    mt-2
+                    rounded-lg
+                    px-4
+                    py-3
+                    text-left
+                    text-sm
+                    font-medium
+                    text-[#14151A]
+                    transition-all
+                    duration-200
+                    hover:bg-[#FFF2EC]
+                    hover:text-[#E8682F]
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                >
+                  {isLoggingOut ? "Logging out..." : "Logout"}
                 </button>
               </nav>
             </motion.aside>
@@ -276,5 +347,4 @@ const CustomerLayout = () => {
 };
 
 export default CustomerLayout;
-
 
