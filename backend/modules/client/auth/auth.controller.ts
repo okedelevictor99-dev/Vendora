@@ -58,7 +58,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response) => {
-    throw new AppError("TEST 500 ERROR", 500);
     const { refreshToken } = req.body || {}
 
     if (!refreshToken) {
