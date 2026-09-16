@@ -685,6 +685,7 @@ const AccountSettingsPage = () => {
                 variant="secondary"
                 onClick={handleLogoutAll}
                 isLoading={isLoggingOutAll}
+                className="bg-[#E8682F] text-white hover:bg-[#D95D28]"
               >
                 Log out all devices
               </Button>
