@@ -289,6 +289,8 @@ const AccountSettingsPage = () => {
       }
     }
   };
+   
+
 
   const submitVerify = async (
     values: VerifyChangeEmailFormValues
@@ -343,6 +345,9 @@ const AccountSettingsPage = () => {
       );
     }
   };
+  if (isLoggingOutAll) {
+  return <FullScreenLoader text="Logging out..." />;
+}
 
   if (isLoading || !profile) {
     return (
@@ -353,10 +358,7 @@ const AccountSettingsPage = () => {
       </div>
     );
   }
-  if (isLoggingOutAll) {
-  return <FullScreenLoader text="Logging out..." />;
-}
-
+ 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="font-serif text-2xl text-[#14151A]">

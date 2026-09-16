@@ -1,130 +1,179 @@
-# 🛒 E-Commerce Backend API
+# 🛒 Vendora — Full-Stack E-Commerce Platform
 
-A production-style e-commerce REST API built with Node.js, Express, and MongoDB.  
-It supports authentication, product management, cart system, order processing, Paystack payments, and admin operations.
+Vendora is a production-style full-stack e-commerce platform built with **React, TypeScript, Node.js, Express, and MongoDB**, featuring payments, inventory management, transactional email, and role-based administration.
 
-This project is designed with a modular feature-based architecture and includes security, logging, email notifications, and inventory management.
+## 🔗 Links
 
----
+* 🌐 **Live Demo:** [Visit Vendora](https://vendora-one-swart.vercel.app/)
+* 💻 **GitHub:** [View Repository](https://github.com/okedelevictor99-dev/Vendora)
 
-# 🚀 Features
-
-## 🔐 Authentication & Security
-- User registration and login
-- JWT authentication (access & refresh tokens)
-- Password reset via email
-- Role-based access control (Admin / Customer)
-- Secure password hashing
-- Rate limiting & security middleware
+> **Payment:** Paystack is currently in test mode. No real money is charged.
 
 ---
 
-## 👤 User Management
-- User profile management
-- Role-based permissions
-- Admin user controls
+## 🧰 Tech Stack
+
+**Frontend:** React 19, TypeScript, Vite, Tailwind CSS, React Router, TanStack React Query, React Hook Form, Zod, Axios
+
+**Backend:** Node.js, Express.js, TypeScript, MongoDB, Mongoose, JWT, bcrypt
+
+**Services:** Paystack, Brevo, Cloudinary, MongoDB Atlas
+
+**Deployment:** Vercel, Render
+
+**Tools:** Git, GitHub, Postman
 
 ---
 
-## 📦 Product Management
-- Create, update, delete products (Admin only)
-- Product image upload support
-- Inventory stock tracking
-- Product search, filtering, and pagination
+## 📸 Screenshots
+
+### Storefront
+
+![Vendora Storefront](./screenshots/storefront.png)
+
+### Product Details
+
+![Product Details](./screenshots/product-details.png)
+
+### Checkout
+
+![Checkout](./screenshots/checkout.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+### Order Management
+
+![Order Management](./screenshots/order-management.png)
 
 ---
 
-## 🛒 Cart System
-- Add/remove items from cart
-- Update item quantity
-- Persistent cart per user
+## ✨ Key Features
+
+### Customer
+
+* Registration, email verification, login, and password reset
+* JWT access and refresh token authentication
+* Product search and filtering
+* Cart and checkout
+* Paystack payments
+* Inventory reservation
+* Order history and tracking
+* Profile management
+* Logout from all devices
+
+### Admin
+
+* Dashboard with users, orders, revenue, and low-stock products
+* Product and inventory management
+* Order management and refunds
+* User management
+* Admin management
+* Admin / Super Admin role-based access
 
 ---
 
-## 📑 Order System
-- Place orders from cart
-- Order status tracking:
-  - Pending
-  - Processing
-  - Shipped
-  - Delivered
-- Order history per user
+## 🔐 Backend & Security
+
+* JWT access/refresh token architecture
+* Role-based authorization
+* Password hashing with bcrypt
+* Persistent refresh tokens
+* Request validation
+* Rate limiting
+* CORS configuration
+* Protected API routes
+* Centralized error handling
+* Logout from all devices
 
 ---
 
-## 💳 Payments
-- Paystack payment integration
-- Payment verification flow
-- Order confirmation after successful payment
+## 💳 Payments & Inventory
+
+Vendora integrates **Paystack** with server-side transaction verification and webhook processing.
+
+```text
+Checkout
+   ↓
+Stock Reservation
+   ↓
+Paystack Payment
+   ↓
+Verification
+   ↓
+Order Confirmation
+```
+
+Expired or unsuccessful reservations can be released through scheduled processing.
 
 ---
 
-## 📧 Notifications
-- Email notifications for:
-  - Account verification / password reset
-  - Order confirmation
-  - Payment success
+## 📧 Transactional Email
+
+**Brevo** handles:
+
+* Account verification
+* Password reset
+* Order confirmation
+* Shipping and delivery notifications
+* Refund notifications
+* Admin invitations
 
 ---
 
-## 📊 Admin Features
-- Product management dashboard endpoints
-- Order management
-- Inventory control
-- User management endpoints
+## 🏗️ Architecture
+
+Vendora uses a feature-based modular architecture.
+
+```text
+backend/
+└── src/
+    ├── modules/
+    │   ├── client/
+    │   └── admin/
+    ├── config/
+    ├── middlewares/
+    ├── services/
+    ├── utils/
+    └── app.ts
+
+frontend/
+└── src/
+    ├── features/
+    ├── components/
+    ├── pages/
+    ├── api-setup/
+    ├── hooks/
+    └── routes/
+```
+
+**Core models:** `User` · `Admin` · `Product` · `Cart` · `Order` · `Token`
 
 ---
 
-## 📄 Logging & Monitoring
-- Application logging for requests and errors
-- Centralized error handling system
+## 🧪 Testing
+
+API endpoints and major workflows were manually tested with **Postman**, including authentication, protected routes, checkout, payments, orders, and admin operations.
 
 ---
 
-# 🏗️ Architecture
+## 🌐 Deployment
 
-This project follows a **feature-based modular architecture**:
-
-src/
-modules/
-auth/
-users/
-products/
-orders/
-cart/
-config/
-middlewares/
-utils/
-services/
-app.ts
-
-
-### Design Approach:
-- Each feature is isolated into modules
-- Business logic separated from request handling
-- Centralized error handling middleware
-- Clean and scalable folder structure
+| Service  | Platform      |
+| -------- | ------------- |
+| Frontend | Vercel        |
+| Backend  | Render        |
+| Database | MongoDB Atlas |
+| Images   | Cloudinary    |
+| Email    | Brevo         |
+| Payments | Paystack      |
 
 ---
 
-# 🛠️ Tech Stack
+## 👨‍💻 Author
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT Authentication
-- Paystack API
-- Nodemailer (Email service)
-- Multer (File uploads)
-- Winston (Logging)
-- Express Rate Limit (Security)
+**Victor Okedele**
+Backend-Focused Full-Stack Developer
 
----
-
-# ⚙️ Setup Instructions
-
-## 1. Clone repository
-```bash
-git clone https://github.com/your-username/ecommerce-backend.git
-cd ecommerce-backend
+[GitHub](https://github.com/okedelevictor99-dev)
