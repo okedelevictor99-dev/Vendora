@@ -1,4 +1,3 @@
-
 import axios, {
   type AxiosError,
   type InternalAxiosRequestConfig,
@@ -32,15 +31,13 @@ export const getRefreshToken = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
-client.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-
-    return config;
+client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
-);
+
+  return config;
+});
 
 const PUBLIC_AUTH_PATHS = [
   "/auth/login",
@@ -55,26 +52,12 @@ const PUBLIC_AUTH_PATHS = [
 const isPublicAuthRequest = (url?: string) =>
   !!url && PUBLIC_AUTH_PATHS.some((path) => url.includes(path));
 
-/*
- * Extract the backend error message.
- *
- * Example backend response:
- * {
- *   success: false,
- *   message: "Insufficient stock for Nike Air Max"
- * }
- */
-const getErrorMessage = (error: AxiosError) => {
-  return (
-    (error.response?.data as { message?: string })?.message ||
-    error.message ||
-    "Something went wrong"
-  );
-};
-
 let isRefreshing = false;
 
-let pendingQueue: Array<() => void> = [];
+let pendingQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
 
 client.interceptors.response.use(
   (response) => response,
@@ -87,23 +70,20 @@ client.interceptors.response.use(
       | undefined;
 
     if (!originalRequest) {
-      return Promise.reject(new Error(getErrorMessage(error)));
+      return Promise.reject(error);
     }
 
     const isUnauthorized = error.response?.status === 401;
 
-    const isRefreshCall = originalRequest.url?.includes(
-      "/auth/refresh-token"
-    );
+    const isRefreshCall = originalRequest.url?.includes("/auth/refresh-token");
 
     const isPublicAuth = isPublicAuthRequest(originalRequest.url);
 
     /*
-     * For normal errors (400, 404, 409, 500, etc.),
-     * return the backend's actual error message.
-     *
-     * Example:
-     * "Insufficient stock for Nike Air Max"
+     * For normal errors (400, 404, 409, 500, etc.), or for auth
+     * edge cases we don't want to attempt a refresh on, just pass
+     * the original AxiosError through. Components read the backend
+     * message themselves via error.response?.data?.message.
      */
     if (
       !isUnauthorized ||
@@ -111,14 +91,17 @@ client.interceptors.response.use(
       isPublicAuth ||
       originalRequest._retry
     ) {
-      return Promise.reject(new Error(getErrorMessage(error)));
+      return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
-        pendingQueue.push(() => resolve(client(originalRequest)));
+      return new Promise((resolve, reject) => {
+        pendingQueue.push({
+          resolve: (value) => resolve(value),
+          reject,
+        });
       });
     }
 
@@ -140,7 +123,7 @@ client.interceptors.response.use(
       // Save the rotated refresh token returned by the backend
       setRefreshToken(data.data.refreshToken);
 
-      pendingQueue.forEach((retry) => retry());
+      pendingQueue.forEach(({ resolve }) => resolve(client(originalRequest)));
 
       pendingQueue = [];
 
@@ -148,6 +131,9 @@ client.interceptors.response.use(
     } catch (refreshError) {
       setAccessToken(null);
       setRefreshToken(null);
+
+      pendingQueue.forEach(({ reject }) => reject(refreshError));
+
       pendingQueue = [];
 
       return Promise.reject(refreshError);
@@ -156,4 +142,3 @@ client.interceptors.response.use(
     }
   }
 );
-

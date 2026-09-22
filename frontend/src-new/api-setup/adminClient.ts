@@ -31,15 +31,13 @@ export const getAdminRefreshToken = () => {
   return localStorage.getItem(ADMIN_REFRESH_TOKEN_KEY);
 };
 
-adminClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    if (adminAccessToken) {
-      config.headers.Authorization = `Bearer ${adminAccessToken}`;
-    }
-
-    return config;
+adminClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  if (adminAccessToken) {
+    config.headers.Authorization = `Bearer ${adminAccessToken}`;
   }
-);
+
+  return config;
+});
 
 const PUBLIC_ADMIN_AUTH_PATHS = [
   "/admin/login",
@@ -48,12 +46,14 @@ const PUBLIC_ADMIN_AUTH_PATHS = [
 ];
 
 const isPublicAdminAuthRequest = (url?: string) =>
-  !!url &&
-  PUBLIC_ADMIN_AUTH_PATHS.some((path) => url.includes(path));
+  !!url && PUBLIC_ADMIN_AUTH_PATHS.some((path) => url.includes(path));
 
 let isRefreshing = false;
 
-let pendingQueue: Array<() => void> = [];
+let pendingQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
 
 adminClient.interceptors.response.use(
   (response) => response,
@@ -75,9 +75,7 @@ adminClient.interceptors.response.use(
       "/admin/refresh-token"
     );
 
-    const isPublicAuth = isPublicAdminAuthRequest(
-      originalRequest.url
-    );
+    const isPublicAuth = isPublicAdminAuthRequest(originalRequest.url);
 
     if (
       !isUnauthorized ||
@@ -91,10 +89,8 @@ adminClient.interceptors.response.use(
     originalRequest._retry = true;
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
-        pendingQueue.push(() =>
-          resolve(adminClient(originalRequest))
-        );
+      return new Promise((resolve, reject) => {
+        pendingQueue.push({ resolve, reject });
       });
     }
 
@@ -107,23 +103,26 @@ adminClient.interceptors.response.use(
         throw new Error("No admin refresh token available");
       }
 
-      const { data } = await adminClient.post(
-        "/admin/refresh-token",
-        {
-          refreshToken,
-        }
-      );
+      const { data } = await adminClient.post("/admin/refresh-token", {
+        refreshToken,
+      });
 
       setAdminAccessToken(data.data.accessToken);
       setAdminRefreshToken(data.data.refreshToken);
 
-      pendingQueue.forEach((retry) => retry());
+      pendingQueue.forEach(({ resolve }) =>
+        resolve(adminClient(originalRequest))
+      );
+
       pendingQueue = [];
 
       return adminClient(originalRequest);
     } catch (refreshError) {
       setAdminAccessToken(null);
       setAdminRefreshToken(null);
+
+      pendingQueue.forEach(({ reject }) => reject(refreshError));
+
       pendingQueue = [];
 
       return Promise.reject(refreshError);
