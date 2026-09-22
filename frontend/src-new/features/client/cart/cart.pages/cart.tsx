@@ -1,9 +1,8 @@
-
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Trash2 } from "lucide-react";
+import { isAxiosError } from "axios";
 
 import { useCart } from "@/features/client/cart/cart.hook";
 import { useToast } from "@/context/toastContext";
@@ -37,8 +36,8 @@ const Cart = () => {
     removeFromCart,
     clearCart,
   } = useCart();
-  
-const { checkout, isCheckingOut } = useCheckout();
+
+  const { checkout, isCheckingOut } = useCheckout();
 
   const { showToast } = useToast();
 
@@ -48,18 +47,19 @@ const { checkout, isCheckingOut } = useCheckout();
   } | null>(null);
 
   const isLoading = loadingAction !== null || isCheckingOut;
+
   const handleCheckout = async () => {
-  try {
-    const { paymentUrl } = await checkout();
-    window.location.href = paymentUrl;
-  }catch (error: unknown) {
-  showToast(
-    error instanceof Error
-      ? error.message
-      : "Failed to start checkout"
-  );
-}
-};
+    try {
+      const { paymentUrl } = await checkout();
+      window.location.href = paymentUrl;
+    } catch (error: unknown) {
+      const message = isAxiosError(error)
+        ? (error.response?.data as { message?: string })?.message
+        : undefined;
+
+      showToast(message ?? "Failed to start checkout");
+    }
+  };
 
   const handleIncrease = async (id: string) => {
     try {
@@ -355,17 +355,16 @@ const { checkout, isCheckingOut } = useCheckout();
         </div>
 
         <Button
-  className="mt-8 w-full py-4 text-base"
-  onClick={handleCheckout}
-  disabled={isLoading || isCheckingOut}
-  isLoading={isCheckingOut}
->
-  Proceed to Checkout
-</Button>
+          className="mt-8 w-full py-4 text-base"
+          onClick={handleCheckout}
+          disabled={isLoading || isCheckingOut}
+          isLoading={isCheckingOut}
+        >
+          Proceed to Checkout
+        </Button>
       </motion.div>
     </div>
   );
 };
 
 export default Cart;
-
